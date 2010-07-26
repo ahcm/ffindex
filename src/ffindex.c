@@ -61,29 +61,38 @@ int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
         perror(path);
         exit(1);
       }
-      /*
-      int c;
-      while((c = fgetc(file)) != EOF)
-      {
-        c = putc(c, data_file);
-        if(c == EOF)
-        {
-          perror(path);
-          exit(1);
-        }
-        offset++;
-      }
-      putc('\0', data_file);
-      offset++;
-      */
       fclose(file);
     }
   }
 }
 
-int fftindex_read()
+int ffindex_restore(FILE *data_file, FILE *index_file, char *input_dir_name)
 {
 }
+
+FILE* ffindex_fopen(FILE *data_file, FILE *index_file, char *filename)
+{
+}
+
+size_t ffindex_get_offset(FILE *index_file, char *filename)
+{
+  char name[NAME_MAX];
+  size_t offset;
+  int n;
+  while((n = fscanf(fp, "%s\t%ld", &name, &offset)) > 0)
+  {
+    if(n != 2)
+    {
+      fprintf(stderr, "wrong numbers of elements in line");
+      exit(1);
+    }
+
+    if(strncmp(filename, name, NAME_MAX) == 0)
+      return offset;
+  }
+  return -1; /* Not found */
+}
+
 
 /* vim: ts=2 sw=2 et
  */
