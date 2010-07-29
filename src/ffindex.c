@@ -50,36 +50,45 @@ int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
     FILE *file = fopen(path, "r");
     if(file == NULL)
       perror(path);
-    else
+
+    fprintf(index_file, "%s\t%ld\n", entry->d_name, offset);
+    size_t read_size;
+    while((read_size = fread(buffer, N, sizeof(double), file)) > 0)
+      offset += fwrite(buffer, N, sizeof(double), data_file);
+
+    if(ferror(file) != 0)
     {
-      fprintf(index_file, "%s\t%ld\n", entry->d_name, offset);
-      size_t read_size;
-      while((read_size = fread(buffer, N, sizeof(double), file)) > 0)
-        offset += fwrite(buffer, N, sizeof(double), data_file);
-      if(ferror(file) != 0)
-      {
-        perror(path);
-        exit(1);
-      }
-      fclose(file);
+      perror(path);
+      exit(1);
     }
+    fclose(file);
   }
+  closedir(dir);
+  free(buffer);
 }
 
 int ffindex_restore(FILE *data_file, FILE *index_file, char *input_dir_name)
 {
 }
 
-FILE* ffindex_fopen(FILE *data_file, FILE *index_file, char *filename)
+void* ffindex_mmap_data(FILE *data_file)
 {
+  struct stat sb;
+  fstat(data_file, &sb);
+  off_t size = sb.st_size;
+  int fd =  fileno(data_file);
+  if(fd < 0)
+    return NULL;
+  return mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
 }
+
 
 size_t ffindex_get_offset(FILE *index_file, char *filename)
 {
   char name[NAME_MAX];
   size_t offset;
   int n;
-  while((n = fscanf(fp, "%s\t%ld", &name, &offset)) > 0)
+  while((n = fscanf(index_file, "%s\t%ld", name, &offset)) > 0)
   {
     if(n != 2)
     {
@@ -93,6 +102,12 @@ size_t ffindex_get_offset(FILE *index_file, char *filename)
   return -1; /* Not found */
 }
 
+char* ffindex_get_filedata(void* data, offset)
 
-/* vim: ts=2 sw=2 et
- */
+FILE* ffindex_fopen(void *data, FILE *index_file, char *filename)
+{
+
+}
+
+
+/* vim: ts=2 sw=2 et */
