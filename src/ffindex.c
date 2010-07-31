@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/mman.h>
 
 #define N 1024
 
@@ -74,7 +75,7 @@ int ffindex_restore(FILE *data_file, FILE *index_file, char *input_dir_name)
 void* ffindex_mmap_data(FILE *data_file)
 {
   struct stat sb;
-  fstat(data_file, &sb);
+  fstat(fileno(data_file), &sb);
   off_t size = sb.st_size;
   int fd =  fileno(data_file);
   if(fd < 0)
@@ -102,11 +103,16 @@ size_t ffindex_get_offset(FILE *index_file, char *filename)
   return -1; /* Not found */
 }
 
-char* ffindex_get_filedata(void* data, offset)
+char* ffindex_get_filedata(void* data, size_t offset)
+{
+  return data + offset;
+}
 
 FILE* ffindex_fopen(void *data, FILE *index_file, char *filename)
 {
-
+  size_t offset = ffindex_get_offset(index_file, filename);
+  char *filedata = ffindex_get_filedata(data, offset);
+  return fmemopen(filedata, strlen(filedata), "r");
 }
 
 
