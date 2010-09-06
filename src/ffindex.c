@@ -46,7 +46,6 @@ int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
     }
     if(!S_ISREG(sb.st_mode))
       continue;
-    puts(path);
     FILE *file = fopen(path, "r");
     if(file == NULL)
       perror(path);
@@ -57,7 +56,6 @@ int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
     while((read_size = fread(buffer, sizeof(char), sizeof(buffer), file)) > 0)
     {
       size_t write_size = fwrite(buffer, sizeof(char), read_size, data_file);
-      printf("read_size, write_size %ld, %ld\n", read_size, write_size);
       offset += write_size;
       if(read_size != write_size) /* XXX handle better */
         perror(path);
@@ -107,7 +105,6 @@ int ffindex_get_entry(FILE *index_file, char *filename, size_t *offset, size_t *
       fprintf(stderr, "wrong numbers of elements in line");
       exit(1);
     }
-    printf("%s %ld %ld\n", name, *offset, *length);
     if(strncmp(filename, name, NAME_MAX) == 0)
       return 0;
   }
