@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-#define N 1024
+#define N 4096
 
 int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
 {
@@ -32,32 +32,45 @@ int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
   }
   size_t offset = 0;
   struct dirent *entry;
-  size_t buffer_size = N * sizeof(double);
-  double *buffer = calloc(N, sizeof(double));
+  char buffer[N];
   while((entry = readdir(dir)) != NULL)
   {
     if(entry->d_name[0] == '.')
       continue;
     strncpy(path + input_dir_name_len, entry->d_name, NAME_MAX);
     struct stat sb;
-    if (stat(path, &sb) == -1)
+    if(stat(path, &sb) == -1)
     {
       perror("stat");
       exit(EXIT_FAILURE);
     }
     if(!S_ISREG(sb.st_mode))
       continue;
-    // puts(path);
+    puts(path);
     FILE *file = fopen(path, "r");
     if(file == NULL)
       perror(path);
 
-    fprintf(index_file, "%s\t%ld\n", entry->d_name, offset);
+    /* Paste file to data file */
+    size_t offset_start = offset;
     size_t read_size;
-    while((read_size = fread(buffer, N, sizeof(double), file)) > 0)
-      offset += fwrite(buffer, N, sizeof(double), data_file);
+    while((read_size = fread(buffer, sizeof(char), sizeof(buffer), file)) > 0)
+    {
+      size_t write_size = fwrite(buffer, sizeof(char), read_size, data_file);
+      printf("read_size, write_size %ld, %ld\n", read_size, write_size);
+      offset += write_size;
+      if(read_size != write_size) /* XXX handle better */
+        perror(path);
+    }
 
-    if(ferror(file) != 0)
+    /* Seperate by '\0' and make sure at least one byte is written */
+    buffer[0] = 0;
+    size_t write_size = fwrite(buffer, sizeof(char), 1, data_file);
+    offset += 1;
+
+    fprintf(index_file, "%s\t%ld\t%ld\n", entry->d_name, offset_start, offset - offset_start);
+
+    if(ferror(file) != 0 || ferror(data_file) != 0)
     {
       perror(path);
       exit(1);
@@ -65,7 +78,6 @@ int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
     fclose(file);
   }
   closedir(dir);
-  free(buffer);
 }
 
 int ffindex_restore(FILE *data_file, FILE *index_file, char *input_dir_name)
@@ -84,21 +96,20 @@ void* ffindex_mmap_data(FILE *data_file)
 }
 
 
-size_t ffindex_get_offset(FILE *index_file, char *filename)
+int ffindex_get_entry(FILE *index_file, char *filename, size_t *offset, size_t *length)
 {
   char name[NAME_MAX];
-  size_t offset;
   int n;
-  while((n = fscanf(index_file, "%s\t%ld", name, &offset)) > 0)
+  while((n = fscanf(index_file, "%s\t%ld\t%ld\n", name, offset, length)) > 0)
   {
-    if(n != 2)
+    if(n != 3)
     {
       fprintf(stderr, "wrong numbers of elements in line");
       exit(1);
     }
-
+    printf("%s %ld %ld\n", name, *offset, *length);
     if(strncmp(filename, name, NAME_MAX) == 0)
-      return offset;
+      return 0;
   }
   return -1; /* Not found */
 }
@@ -110,10 +121,20 @@ char* ffindex_get_filedata(void* data, size_t offset)
 
 FILE* ffindex_fopen(void *data, FILE *index_file, char *filename)
 {
-  size_t offset = ffindex_get_offset(index_file, filename);
-  char *filedata = ffindex_get_filedata(data, offset);
-  return fmemopen(filedata, strlen(filedata), "r");
+  size_t offset, length;
+  if(ffindex_get_entry(index_file, filename, &offset, &length) == 0)
+  {
+    char *filedata = ffindex_get_filedata(data, offset);
+    return fmemopen(filedata, length, "r");
+  }
+  else
+  {
+    fprintf(stderr, "ERROR in ffindex_get_entry");
+    exit(1);
+  }
+
 }
 
 
-/* vim: ts=2 sw=2 et */
+/* vim: ts=2 sw=2 et
+*/
