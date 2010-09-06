@@ -32,9 +32,7 @@ int main(int argn, char **argv)
   FILE *file = ffindex_fopen(data, index_file, filename);
   char line[LINE_MAX];
   while(fgets(line, LINE_MAX, file) != NULL)
-  {
-    puts(line);
-  }
+    printf("%s", line);
 
   return 0;
 }
