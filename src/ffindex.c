@@ -93,8 +93,8 @@ void* ffindex_mmap_data(FILE *data_file)
   return mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
 }
 
-
-int ffindex_get_entry(FILE *index_file, char *filename, size_t *offset, size_t *length)
+/* Starts to look for entry_name in index_file from the current position */
+int ffindex_get_next_entry_by_name(FILE *index_file, char *entry_name, size_t *offset, size_t *length)
 {
   char name[NAME_MAX];
   int n;
@@ -102,13 +102,20 @@ int ffindex_get_entry(FILE *index_file, char *filename, size_t *offset, size_t *
   {
     if(n != 3)
     {
-      fprintf(stderr, "wrong numbers of elements in line");
+      fprintf(stderr, "broken index file: wrong numbers of elements in line");
       exit(1);
     }
-    if(strncmp(filename, name, NAME_MAX) == 0)
+    if(strncmp(entry_name, name, NAME_MAX) == 0)
       return 0;
   }
   return -1; /* Not found */
+}
+
+int ffindex_get_entry(FILE *index_file, char *filename, size_t *offset, size_t *length)
+{
+  int found = ffindex_get_next_entry_by_name(index_file, filename, offset, length);
+  rewind(index_file);
+  return found;
 }
 
 char* ffindex_get_filedata(void* data, size_t offset)
@@ -129,7 +136,6 @@ FILE* ffindex_fopen(void *data, FILE *index_file, char *filename)
     fprintf(stderr, "ERROR in ffindex_get_entry");
     exit(1);
   }
-
 }
 
 
