@@ -27,13 +27,14 @@ int main(int argn, char **argv)
   if( data_file == NULL) { perror(data_filename); return 1; }
   if(index_file == NULL) { perror(index_filename); return 1; }
 
-  void *data = ffindex_mmap_data(data_file);
+  char *data = ffindex_mmap_data(data_file);
 
   for(int i = 3; i < argn; i++)
   {
     char *filename = argv[i];
     FILE *file = ffindex_fopen(data, index_file, filename);
     char line[LINE_MAX];
+    /* XXX Mask nonprintable characters */
     while(fgets(line, LINE_MAX, file) != NULL)
       printf("%s", line);
   }

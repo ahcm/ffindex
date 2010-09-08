@@ -1,5 +1,5 @@
 
-size_t ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name);
+int ffindex_build(FILE *data_file, FILE *index_file, size_t *offset, char *input_dir_name);
 
 FILE* ffindex_fopen(void *data, FILE *index_file, char *filename);
 

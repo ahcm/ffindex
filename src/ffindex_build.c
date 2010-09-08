@@ -23,8 +23,10 @@ int main(int argn, char **argv)
   FILE *index_file = fopen(index_filename, "w+");
   if( data_file == NULL) { perror(data_filename); return 1; }
   if(index_file == NULL) { perror(index_filename); return 1; }
+
+  size_t offset = 0;
   for(int i = 3; i < argn; i++)
-    if(ffindex_build(data_file, index_file, argv[i]) < 0)
+    if(ffindex_build(data_file, index_file, &offset, argv[i]) < 0)
       perror(argv[i]);
 
   return 0;

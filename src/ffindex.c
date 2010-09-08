@@ -17,7 +17,7 @@
 
 #define N 4096
 
-int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
+int ffindex_build(FILE *data_file, FILE *index_file, size_t *base_offset, char *input_dir_name)
 {
   DIR *dir = opendir(input_dir_name);
   if(dir == NULL)
@@ -30,7 +30,7 @@ int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
     path[input_dir_name_len] = '/';
     input_dir_name_len += 1;
   }
-  size_t offset = 0;
+  size_t offset = *base_offset;
   struct dirent *entry;
   char buffer[N];
   while((entry = readdir(dir)) != NULL)
@@ -76,13 +76,16 @@ int ffindex_build(FILE *data_file, FILE *index_file, char *input_dir_name)
     fclose(file);
   }
   closedir(dir);
+  *base_offset = offset;
+  return 0;
 }
 
 int ffindex_restore(FILE *data_file, FILE *index_file, char *input_dir_name)
 {
+  return 0;
 }
 
-void* ffindex_mmap_data(FILE *data_file)
+char* ffindex_mmap_data(FILE *data_file)
 {
   struct stat sb;
   fstat(fileno(data_file), &sb);
@@ -118,7 +121,7 @@ int ffindex_get_entry(FILE *index_file, char *filename, size_t *offset, size_t *
   return found;
 }
 
-char* ffindex_get_filedata(void* data, size_t offset)
+char* ffindex_get_filedata(char* data, size_t offset)
 {
   return data + offset;
 }
