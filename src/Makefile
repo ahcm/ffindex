@@ -18,8 +18,8 @@ libffindex.so:
 	ln -sf libffindex.so.0.1 libffindex.so
 
 test:
-	LD_LIBRARY_PATH=. ./ffindex_build test.data test.ffindex ../test/data
-	LD_LIBRARY_PATH=. ./ffindex_get  test.data test.ffindex a b
+	LD_LIBRARY_PATH=. ./ffindex_build test.data test.ffindex ../test/data ../test/data2
+	LD_LIBRARY_PATH=. ./ffindex_get  test.data test.ffindex a b foo
 
 clean:
 	rm -f ffindex.o ffindex_build ffindex_build.o ffindex_get ffindex_get.o libffindex.so libffindex.so.0.1
