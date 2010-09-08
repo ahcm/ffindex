@@ -1,9 +1,9 @@
 
 int ffindex_build(FILE *data_file, FILE *index_file, size_t *offset, char *input_dir_name);
 
-FILE* ffindex_fopen(void *data, FILE *index_file, char *filename);
+FILE* ffindex_fopen(char *data, FILE *index_file, char *filename);
 
-void* ffindex_mmap_data(FILE *data_file);
+char* ffindex_mmap_data(FILE *data_file);
 
 int ffindex_get_next_entry_by_name(FILE *index_file, char *entry_name, size_t *offset, size_t *length);
 

@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
+#include "ffindex.h"
+
 #define N 4096
 
 int ffindex_build(FILE *data_file, FILE *index_file, size_t *base_offset, char *input_dir_name)
@@ -93,7 +95,7 @@ char* ffindex_mmap_data(FILE *data_file)
   int fd =  fileno(data_file);
   if(fd < 0)
     return NULL;
-  return mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+  return (char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
 }
 
 /* Starts to look for entry_name in index_file from the current position */
@@ -126,7 +128,7 @@ char* ffindex_get_filedata(char* data, size_t offset)
   return data + offset;
 }
 
-FILE* ffindex_fopen(void *data, FILE *index_file, char *filename)
+FILE* ffindex_fopen(char *data, FILE *index_file, char *filename)
 {
   size_t offset, length;
   if(ffindex_get_entry(index_file, filename, &offset, &length) == 0)
