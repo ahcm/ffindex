@@ -17,6 +17,7 @@
 
 #include "ffindex.h"
 
+/* XXX Use page size? */
 #define N 4096
 
 int ffindex_build(FILE *data_file, FILE *index_file, size_t *base_offset, char *input_dir_name)
@@ -59,8 +60,8 @@ int ffindex_build(FILE *data_file, FILE *index_file, size_t *base_offset, char *
     {
       size_t write_size = fwrite(buffer, sizeof(char), read_size, data_file);
       offset += write_size;
-      if(read_size != write_size) /* XXX handle better */
-        perror(path);
+      if(read_size != write_size)
+        perror(path); /* XXX handle better */
     }
 
     /* Seperate by '\0' and make sure at least one byte is written */
@@ -82,65 +83,97 @@ int ffindex_build(FILE *data_file, FILE *index_file, size_t *base_offset, char *
   return 0;
 }
 
+
 int ffindex_restore(FILE *data_file, FILE *index_file, char *input_dir_name)
 {
   return 0;
 }
 
-char* ffindex_mmap_data(FILE *data_file)
+
+char* ffindex_mmap_data(FILE *file)
 {
   struct stat sb;
-  fstat(fileno(data_file), &sb);
+  fstat(fileno(file), &sb);
   off_t size = sb.st_size;
-  int fd =  fileno(data_file);
+  int fd =  fileno(file);
   if(fd < 0)
     return NULL;
   return (char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
 }
 
-/* Starts to look for entry_name in index_file from the current position */
-int ffindex_get_next_entry_by_name(FILE *index_file, char *entry_name, size_t *offset, size_t *length)
-{
-  char name[NAME_MAX];
-  int n;
-  while((n = fscanf(index_file, "%s\t%ld\t%ld\n", name, offset, length)) > 0)
-  {
-    if(n != 3)
-    {
-      fprintf(stderr, "broken index file: wrong numbers of elements in line");
-      exit(1);
-    }
-    if(strncmp(entry_name, name, NAME_MAX) == 0)
-      return 0;
-  }
-  return -1; /* Not found */
+
+static int ffindex_compare_entries_by_name(const void *pentry1, const void *pentry2)
+{   
+  ffindex_entry_t* entry1 = (ffindex_entry_t*)pentry1;
+  ffindex_entry_t* entry2 = (ffindex_entry_t*)pentry2;
+  return strncmp(entry1->name, entry2->name, FFINDEX_MAX_ENTRY_NAME_LENTH);
 }
 
-int ffindex_get_entry(FILE *index_file, char *filename, size_t *offset, size_t *length)
+
+ffindex_entry_t* ffindex_bsearch_get_entry(ffindex_index_t *index, char *name)
 {
-  int found = ffindex_get_next_entry_by_name(index_file, filename, offset, length);
-  rewind(index_file);
-  return found;
+  ffindex_entry_t search;
+  strncpy(search.name, name, FFINDEX_MAX_ENTRY_NAME_LENTH);
+  return bsearch(&search, index->entries, index->n_entries, sizeof(ffindex_entry_t), ffindex_compare_entries_by_name);
 }
+
+
+ffindex_index_t* ffindex_index_parse(FILE *index_file)
+{
+  ffindex_index_t *index = calloc(1, sizeof(ffindex_index_t));
+  if(index == NULL)
+  {
+    perror("ffindex_index_parse: calloc failed: ");
+    exit(EXIT_FAILURE);
+  }
+
+  index->file = index_file;
+  int n, i = 0;
+  while((n = fscanf(index->file, "%s\t%ld\t%ld\n", index->entries[i].name, &(index->entries[i].offset), &(index->entries[i].length))) == 3)
+    i++;
+
+  if(n < 0 && ferror(index->file))
+  {
+    perror("ffindex_index_parse: ");
+    exit(EXIT_FAILURE);
+  }
+  else if(n > 0)
+  {
+    fprintf(stderr, "broken index file: wrong numbers of elements in line");
+    exit(EXIT_FAILURE);
+  }
+
+  index->n_entries = i;
+
+  if(index->n_entries == 0)
+    return NULL;
+
+  return index;
+}
+
+/*
+ffindex_entry_t*  ffindex_linear_get_entry(ffindex_index_t *index, char *name)
+{
+  return ffindex_get_next_entry_by_name(index, name);
+}
+*/
+
 
 char* ffindex_get_filedata(char* data, size_t offset)
 {
   return data + offset;
 }
 
-FILE* ffindex_fopen(char *data, FILE *index_file, char *filename)
+
+FILE* ffindex_fopen(char *data, ffindex_index_t *index, char *filename)
 {
-  size_t offset, length;
-  if(ffindex_get_entry(index_file, filename, &offset, &length) == 0)
-  {
-    char *filedata = ffindex_get_filedata(data, offset);
-    return fmemopen(filedata, length, "r");
-  }
-  else
-  {
-    fprintf(stderr, "ERROR in ffindex_get_entry");
-    exit(1);
-  }
+  ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, filename);
+
+  if(entry == NULL)
+    return NULL;
+
+  char *filedata = ffindex_get_filedata(data, entry->offset);
+  return fmemopen(filedata, entry->length, "r");
 }
 
 

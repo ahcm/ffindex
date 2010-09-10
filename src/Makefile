@@ -5,6 +5,8 @@ LDFLAGS+=-Wl,-z,defs
 
 all: ffindex_get ffindex_build
 
+ffindex.o: ffindex.c ffindex.h
+
 ffindex_get: libffindex.so libffindex.so.0.1 ffindex_get.o
 	$(CC) $(CFLAGS) -L. -lffindex ffindex.o ffindex_get.o -o $@ 
 
@@ -18,7 +20,8 @@ libffindex.so:
 	ln -sf libffindex.so.0.1 libffindex.so
 
 test:
-	LD_LIBRARY_PATH=. ./ffindex_build test.data test.ffindex ../test/data ../test/data2
+	LD_LIBRARY_PATH=. ./ffindex_build test.data test.ffindex_u ../test/data ../test/data2
+	sort test.ffindex_u > test.ffindex
 	LD_LIBRARY_PATH=. ./ffindex_get  test.data test.ffindex a b foo
 
 clean:

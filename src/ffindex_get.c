@@ -29,10 +29,17 @@ int main(int argn, char **argv)
 
   char *data = ffindex_mmap_data(data_file);
 
+  ffindex_index_t* index = ffindex_index_parse(index_file);
+  if(index == NULL)
+  {
+    perror("no index:");
+    return 1;
+  }
+
   for(int i = 3; i < argn; i++)
   {
     char *filename = argv[i];
-    FILE *file = ffindex_fopen(data, index_file, filename);
+    FILE *file = ffindex_fopen(data, index, filename);
     char line[LINE_MAX];
     /* XXX Mask nonprintable characters */
     while(fgets(line, LINE_MAX, file) != NULL)
