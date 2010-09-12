@@ -27,7 +27,8 @@ int main(int argn, char **argv)
   if( data_file == NULL) { perror(data_filename); return 1; }
   if(index_file == NULL) { perror(index_filename); return 1; }
 
-  char *data = ffindex_mmap_data(data_file);
+  size_t data_size;
+  char *data = ffindex_mmap_data(data_file, &data_size);
 
   ffindex_index_t* index = ffindex_index_parse(index_file);
   if(index == NULL)
@@ -41,9 +42,8 @@ int main(int argn, char **argv)
     char *filename = argv[i];
     FILE *file = ffindex_fopen(data, index, filename);
     char line[LINE_MAX];
-    /* XXX Mask nonprintable characters */
     while(fgets(line, LINE_MAX, file) != NULL)
-      printf("%s", line);
+      printf("%s", line); /* XXX Mask nonprintable characters */
   }
 
   return 0;

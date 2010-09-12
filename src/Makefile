@@ -24,6 +24,9 @@ test:
 	sort test.ffindex_u > test.ffindex
 	LD_LIBRARY_PATH=. ./ffindex_get  test.data test.ffindex a b foo
 
+time:
+	LD_LIBRARY_PATH=. zsh -c "time ./ffindex_get  ../test_big/nr20_11Jan10_a3m_db ../test_big/nr20_11Jan10_a3m_db.ffindex BABBAMIBA.a3m KARDUZEBA.a3m HARPAQIBA.a3m > /dev/null"
+
 clean:
 	rm -f ffindex.o ffindex_build ffindex_build.o ffindex_get ffindex_get.o libffindex.so libffindex.so.0.1
 

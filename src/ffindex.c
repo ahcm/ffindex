@@ -90,15 +90,15 @@ int ffindex_restore(FILE *data_file, FILE *index_file, char *input_dir_name)
 }
 
 
-char* ffindex_mmap_data(FILE *file)
+char* ffindex_mmap_data(FILE *file, size_t* size)
 {
   struct stat sb;
   fstat(fileno(file), &sb);
-  off_t size = sb.st_size;
+  *size = sb.st_size;
   int fd =  fileno(file);
   if(fd < 0)
     return NULL;
-  return (char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+  return (char*)mmap(NULL, *size, PROT_READ, MAP_PRIVATE, fd, 0);
 }
 
 
@@ -128,7 +128,24 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file)
   }
 
   index->file = index_file;
+  index->index_data = ffindex_mmap_data(index_file, &(index->index_data_size));
   int n, i = 0;
+  char c;
+  char* d = index->index_data;
+  char* end;
+  while(d < (index->index_data + index->index_data_size))
+  {
+    for(int p = 0; *d != '\t'; d++)
+      index->entries[i].name[p++] = *d;
+    index->entries[i].offset = strtol(d, &end, 10);
+    d = end;
+    index->entries[i].length  = strtol(d, &end, 10);
+    d = end + 1;
+    i++;
+  }
+
+
+    /*
   while((n = fscanf(index->file, "%s\t%ld\t%ld\n", index->entries[i].name, &(index->entries[i].offset), &(index->entries[i].length))) == 3)
     i++;
 
@@ -142,6 +159,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file)
     fprintf(stderr, "broken index file: wrong numbers of elements in line");
     exit(EXIT_FAILURE);
   }
+  */
 
   index->n_entries = i;
 
