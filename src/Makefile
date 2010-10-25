@@ -1,6 +1,6 @@
 INSTALL_DIR=..
 LANG=C
-CFLAGS+=-std=c99 -O3 -openmp -g -fPIC
+CFLAGS+=-std=c99 -O3 -openmp -g -fPIC -Wall
 LDFLAGS+=-Wl,-z,defs
 #-Wl,--version-script=libffindex.map
 
@@ -33,7 +33,9 @@ clean:
 install:
 	mkdir -p $(INSTALL_DIR)/bin
 	mkdir -p $(INSTALL_DIR)/lib
+	mkdir -p $(INSTALL_DIR)/include
 	install ffindex_get $(INSTALL_DIR)/bin/ffindex_get
 	install ffindex_build $(INSTALL_DIR)/bin/ffindex_build
 	install libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so.0.1
 	ln -sf libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so
+	install ffindex.h $(INSTALL_DIR)/include/ffindex.h

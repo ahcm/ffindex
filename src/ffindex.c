@@ -74,7 +74,7 @@ int ffindex_insert(FILE *data_file, FILE *index_file, size_t *base_offset, char 
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
     buffer[0] = '\0';
-    size_t write_size = fwrite(buffer, sizeof(char), 1, data_file);
+    fwrite(buffer, sizeof(char), 1, data_file); /* XXX check for error */
     offset += 1;
 
     fprintf(index_file, "%s\t%ld\t%ld\n", entry->d_name, offset_start, offset - offset_start);
@@ -137,8 +137,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file)
 
   index->file = index_file;
   index->index_data = ffindex_mmap_data(index_file, &(index->index_data_size));
-  int n, i = 0;
-  char c;
+  int i = 0;
   char* d = index->index_data;
   char* end;
   while(d < (index->index_data + index->index_data_size))
