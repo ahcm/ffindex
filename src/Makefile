@@ -1,4 +1,4 @@
-#CC=g++
+INSTALL_DIR=..
 LANG=C
 CFLAGS+=-std=c99 -O3 -openmp -g -fPIC
 LDFLAGS+=-Wl,-z,defs
@@ -30,3 +30,10 @@ time:
 clean:
 	rm -f ffindex.o ffindex_build ffindex_build.o ffindex_get ffindex_get.o libffindex.so libffindex.so.0.1
 
+install:
+	mkdir -p $(INSTALL_DIR)/bin
+	mkdir -p $(INSTALL_DIR)/lib
+	install ffindex_get $(INSTALL_DIR)/bin/ffindex_get
+	install ffindex_build $(INSTALL_DIR)/bin/ffindex_build
+	install libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so.0.1
+	ln -sf libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so
