@@ -93,7 +93,7 @@ int ffindex_insert(FILE *data_file, FILE *index_file, size_t *base_offset, char 
   return 0;
 }
 
-
+/* XXX not implemented yet */
 int ffindex_restore(FILE *data_file, FILE *index_file, char *input_dir_name)
 {
   return -1;
@@ -142,15 +142,16 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file)
   int i = 0;
   char* d = index->index_data;
   char* end;
-  while(d < (index->index_data + index->index_data_size))
+  /* Faster than scanf per line */
+  for(i = 0; d < (index->index_data + index->index_data_size); i++)
   {
+    //strncpy(index->entries[i].name, *d, FFINDEX_MAX_ENTRY_NAME_LENTH);
     for(int p = 0; *d != '\t'; d++)
       index->entries[i].name[p++] = *d;
     index->entries[i].offset = strtol(d, &end, 10);
     d = end;
     index->entries[i].length  = strtol(d, &end, 10);
     d = end + 1;
-    i++;
   }
 
   index->n_entries = i;
