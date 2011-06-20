@@ -39,7 +39,7 @@ int main(int argn, char **argv)
   size_t data_size;
   char *data = ffindex_mmap_data(data_file, &data_size);
 
-  ffindex_index_t* index = ffindex_index_parse(index_file);
+  ffindex_index_t* index = ffindex_index_parse(index_file, 0);
   if(index == NULL)
   {
     perror("no index:");
