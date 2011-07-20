@@ -14,8 +14,9 @@
 #define _LARGEFILE64_SOURCE 1
 #define _FILE_OFFSET_BITS 64
 
-#include <stdio.h>
 #include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "ffindex.h"
 
@@ -33,8 +34,8 @@ int main(int argn, char **argv)
   FILE *data_file  = fopen(data_filename, "r");
   FILE *index_file = fopen(index_filename, "r");
 
-  if( data_file == NULL) { perror(data_filename); return 1; }
-  if(index_file == NULL) { perror(index_filename); return 1; }
+  if( data_file == NULL) { perror(data_filename); exit(EXIT_FAILURE); }
+  if(index_file == NULL) { perror(index_filename); exit(EXIT_FAILURE); }
 
   size_t data_size;
   char *data = ffindex_mmap_data(data_file, &data_size);
@@ -42,8 +43,8 @@ int main(int argn, char **argv)
   ffindex_index_t* index = ffindex_index_parse(index_file, 0);
   if(index == NULL)
   {
-    perror("no index:");
-    return 1;
+    perror("ffindex_index_parse faile");
+    exit(EXIT_FAILURE);
   }
 
   for(int i = 3; i < argn; i++)

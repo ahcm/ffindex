@@ -14,15 +14,16 @@
 #define _LARGEFILE64_SOURCE 1
 #define _FILE_OFFSET_BITS 64
 
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <sys/mman.h>
+#include <errno.h>
 #include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "ext/fmemopen.h" /* For OS not yet implementing this new standard function */
 #include "ffindex.h"
@@ -138,7 +139,7 @@ char* ffindex_mmap_data(FILE *file, size_t* size)
   *size = sb.st_size;
   int fd =  fileno(file);
   if(fd < 0)
-    return NULL;
+    return MAP_FAILED;
   return (char*)mmap(NULL, *size, PROT_READ, MAP_PRIVATE, fd, 0);
 }
 
@@ -163,11 +164,14 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 {
   if(num_max_entries == 0)
     num_max_entries = FFINDEX_MAX_INDEX_ENTRIES_DEFAULT;
-  ffindex_index_t *index = (ffindex_index_t *)malloc(sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * num_max_entries));
+  size_t nbytes = sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * num_max_entries);
+  ffindex_index_t *index = (ffindex_index_t *)malloc(nbytes);
   if(index == NULL)
   {
-    perror("ffindex_index_parse: calloc failed: ");
-    exit(EXIT_FAILURE);
+    int myerrno = errno;
+    char* errstr = strerror(myerrno);
+    fprintf(stderr, "%s:%d ffindex_index_parse: malloc of %ld bytes failed: %s\n", __FILE__, __LINE__, nbytes ,errstr);
+    return NULL;
   }
 
   index->file = index_file;

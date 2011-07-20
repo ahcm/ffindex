@@ -22,7 +22,8 @@ libffindex.so: libffindex.so.0.1
 
 test:
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_build -s test.data test.ffindex ../test/data ../test/data2
-	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_get  test.data test.ffindex a b foo
+	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_get  test.data test.ffindex a b foo | tee test.out
+	diff test.out test.should
 
 time:
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" zsh -c "time ./ffindex_get  ../test_big/nr20_11Jan10_a3m_db ../test_big/nr20_11Jan10_a3m_db.ffindex BABBAMIBA.a3m KARDUZEBA.a3m HARPAQIBA.a3m WOQQATEBA.a3m BEBRAQIBA.a3m GIRSAKEBA.a3m NAQTIFIBA.a3m BIWCIQABA.a3m > /dev/null"
