@@ -49,7 +49,7 @@ int ffindex_insert_list_file(FILE *data_file, FILE *index_file, size_t *start_of
 }
 
 
-/* Insert all file from directory into ffindex */
+/* Insert all files from directory into ffindex */
 int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, char *input_dir_name)
 {
   DIR *dir = opendir(input_dir_name);
