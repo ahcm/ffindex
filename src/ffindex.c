@@ -209,6 +209,9 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 }
 
 
+/* Using a function fot this looks like overhead. But a more advanced data format,
+ * say a compressed one, can do it's magic here. 
+ */
 char* ffindex_get_filedata(char* data, size_t offset)
 {
   return data + offset;
