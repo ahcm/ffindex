@@ -175,9 +175,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   ffindex_index_t *index = (ffindex_index_t *)malloc(nbytes);
   if(index == NULL)
   {
-    int myerrno = errno;
-    char* errstr = strerror(myerrno);
-    fprintf(stderr, "%s:%d ffindex_index_parse: malloc of %ld bytes failed: %s\n", __FILE__, __LINE__, nbytes ,errstr);
+    fferror_print(__FILE__, __LINE__, __func__, "malloc failed");
     return NULL;
   }
 
