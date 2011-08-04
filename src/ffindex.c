@@ -26,6 +26,7 @@
 #include <unistd.h>
 
 #include "ext/fmemopen.h" /* For OS not yet implementing this new standard function */
+#include "fferror.h"
 #include "ffindex.h"
 
 /* XXX Use page size? */
@@ -72,10 +73,7 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
     strncpy(path + input_dir_name_len, entry->d_name, NAME_MAX);
     struct stat sb;
     if(stat(path, &sb) == -1)
-    {
-      perror("stat");
-      exit(EXIT_FAILURE);
-    }
+      fferror_print(__FILE__, __LINE__, __func__, path);
     if(!S_ISREG(sb.st_mode))
       continue;
     ffindex_insert_file(data_file, index_file, &offset, path, entry->d_name);
@@ -107,10 +105,7 @@ int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, char 
       size_t write_size = fwrite(buffer, sizeof(char), read_size, data_file);
       *offset += write_size;
       if(read_size != write_size)
-      {
-        perror(path); /* XXX handle better */
-        myerrno = errno;
-      }
+        fferror_print(__FILE__, __LINE__, __func__, path);
     }
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
@@ -131,8 +126,7 @@ int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, char 
 
 EXCEPTION_ffindex_insert_file:
     {
-      myerrno = errno;
-      perror(path);
+      fferror_print(__FILE__, __LINE__, __func__, "");
       fclose(file);
       return myerrno;
     }
@@ -244,7 +238,8 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
   for(int i = 0; i < index->n_entries; i++)
   {
     ffindex_entry_t ffindex_entry = index->entries[i];
-    fprintf(index_file, "%s\t%ld\t%ld\n", ffindex_entry.name, ffindex_entry.offset, ffindex_entry.length);
+    if(fprintf(index_file, "%s\t%ld\t%ld\n", ffindex_entry.name, ffindex_entry.offset, ffindex_entry.length) < 0)
+      return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
 }

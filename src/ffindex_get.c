@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "ffindex.h"
+#include "fferror.h"
 
 
 int main(int argn, char **argv)
@@ -31,11 +32,11 @@ int main(int argn, char **argv)
   char *data_filename  = argv[1];
   char *index_filename = argv[2];
 
-  FILE *data_file  = fopen(data_filename, "r");
+  FILE *data_file  = fopen(data_filename,  "r");
   FILE *index_file = fopen(index_filename, "r");
 
-  if( data_file == NULL) { perror(data_filename); exit(EXIT_FAILURE); }
-  if(index_file == NULL) { perror(index_filename); exit(EXIT_FAILURE); }
+  if( data_file == NULL) { fferror_print(__FILE__, __LINE__, "ffindex_get", data_filename);  exit(EXIT_FAILURE); }
+  if(index_file == NULL) { fferror_print(__FILE__, __LINE__, "ffindex_get", index_filename);  exit(EXIT_FAILURE); }
 
   size_t data_size;
   char *data = ffindex_mmap_data(data_file, &data_size);
@@ -43,7 +44,7 @@ int main(int argn, char **argv)
   ffindex_index_t* index = ffindex_index_parse(index_file, 0);
   if(index == NULL)
   {
-    perror("ffindex_index_parse faile");
+    fferror_print(__FILE__, __LINE__, "ffindex_index_parse", index_filename);
     exit(EXIT_FAILURE);
   }
 
@@ -51,9 +52,17 @@ int main(int argn, char **argv)
   {
     char *filename = argv[i];
     FILE *file = ffindex_fopen(data, index, filename);
-    char line[LINE_MAX];
-    while(fgets(line, LINE_MAX, file) != NULL)
-      printf("%s", line); /* XXX Mask nonprintable characters */
+    if(file == NULL)
+    {
+      errno = ENOENT; 
+      fferror_print(__FILE__, __LINE__, "ffindex_fopen file not found in index", filename);
+    }
+    else
+    {
+      char line[LINE_MAX];
+      while(fgets(line, LINE_MAX, file) != NULL)
+        printf("%s", line); /* XXX Mask nonprintable characters */
+    }
   }
 
   return 0;
