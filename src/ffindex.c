@@ -92,9 +92,14 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
 /* Insert one file into ffindex */
 int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, char *path, char *name)
 {
+    int myerrno = 0;
     FILE *file = fopen(path, "r");
+    myerrno = errno;
     if(file == NULL)
+    {
       perror(path);
+      return myerrno;
+    }
 
     /* copy and paste file to data file */
     char buffer[FFINDEX_BUFFER_SIZE];
@@ -105,7 +110,10 @@ int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, char 
       size_t write_size = fwrite(buffer, sizeof(char), read_size, data_file);
       *offset += write_size;
       if(read_size != write_size)
+      {
         perror(path); /* XXX handle better */
+        myerrno = errno;
+      }
     }
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
@@ -118,11 +126,12 @@ int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, char 
 
     if(ferror(file) != 0 || ferror(data_file) != 0)
     {
+      myerrno = errno;
       perror(path);
-      exit(1);
+      return myerrno;
     }
     fclose(file);
-    return 0;
+    return myerrno;
 }
 
 /* XXX not implemented yet */
