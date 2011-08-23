@@ -252,6 +252,7 @@ ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char* entry_name)
   ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, entry_name);
   if(entry == NULL)
     return index;
+  /* Move entries after the unlinked one to close the gap */
   memmove(entry, entry + 1, (index->entries + index->num_max_entries + 1) - (entry + 1));
   index->n_entries--;
   return index;

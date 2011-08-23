@@ -24,8 +24,10 @@
 
 
 #include "ffindex.h"
+#include "fferror.h"
 
 #define MAX_FILENAME_LIST_FILES 4096
+
 
 void usage(char *program_name)
 {
@@ -116,6 +118,7 @@ int main(int argn, char **argv)
     index_file = fopen(index_filename, "w");
     if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
     err += ffindex_write(index, index_file);
+
     return EXIT_SUCCESS;
   }
 
@@ -124,8 +127,9 @@ int main(int argn, char **argv)
   if(append)
   {
     data_file  = fopen(data_filename, "a");
-    index_file = fopen(index_filename, "a+");
     if( data_file == NULL) { perror(data_filename); return EXIT_FAILURE; }
+
+    index_file = fopen(index_filename, "a+");
     if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
 
     struct stat sb;
@@ -138,9 +142,14 @@ int main(int argn, char **argv)
   }
   else
   {
+    struct stat st;
+
+    if(stat(data_filename, &st) == 0) { errno = EEXIST; perror(data_filename); return EXIT_FAILURE; }
     data_file  = fopen(data_filename, "w");
-    index_file = fopen(index_filename, "w+");
     if( data_file == NULL) { perror(data_filename); return EXIT_FAILURE; }
+
+    if(stat(index_filename, &st) == 0) { errno = EEXIST; perror(index_filename); return EXIT_FAILURE; }
+    index_file = fopen(index_filename, "w+");
     if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
   }
 
