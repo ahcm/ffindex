@@ -19,5 +19,5 @@
 #include <string.h>
 
 
-int fferror_print(char *sourcecode_filename, int line, const char *function_name, char *message);
+int fferror_print(char *sourcecode_filename, int line, const char *function_name, const char *message);
                                                                             

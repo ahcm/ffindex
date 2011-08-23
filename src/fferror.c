@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include "fferror.h"
 
-int fferror_print(char *sourcecode_filename, int line, const char *function_name, char *message)
+int fferror_print(char *sourcecode_filename, int line, const char *function_name, const char *message)
 {
         int myerrno = errno;
         char* errstr = strerror(myerrno);

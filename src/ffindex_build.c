@@ -29,20 +29,22 @@
 
 void usage(char *program_name)
 {
-    fprintf(stderr, "USAGE: %s [-asv] [-f file]* data_filename index_filename [dirs_to_index ...]\n"
+    fprintf(stderr, "USAGE: %s [-a|-u|-v] [-s] [-f file]* data_filename index_filename [dirs_to_index ...]\n"
                     "\t-a\tappend\n"
                     "\t-f file\tfile each line containing a filename to index\n"
-                    "\t\t\t-f can be specified up to MAX_FILENAME_LIST_FILES times\n"
+                    "\t\t-f can be specified up to %d times\n"
                     "\t-s\tsort index file\n"
-                    "\t-v\tprint version and other info then exit", program_name);
+                    "\t-u\tunlink entry (remove from index only)\n"
+                    "\t-v\tprint version and other info then exit\n", program_name, MAX_FILENAME_LIST_FILES);
 }
 
 int main(int argn, char **argv)
 {
-  int append = 0, sort = 0, opt, err = EXIT_SUCCESS;
+  int append = 0, sort = 0, unlink = 0, version = 0;
+  int opt, err = EXIT_SUCCESS;
   char* list_filenames[MAX_FILENAME_LIST_FILES];
-  int list_filenames_index = 0, version = 0;
-  while ((opt = getopt(argn, argv, "asvf:")) != -1)
+  size_t list_filenames_index = 0;
+  while ((opt = getopt(argn, argv, "asuvf:")) != -1)
   {
     switch (opt)
     {
@@ -52,10 +54,14 @@ int main(int argn, char **argv)
       case 'f':
         list_filenames[list_filenames_index++] = optarg;
         break;
-      case 'v':
-        version = 1;
       case 's':
         sort = 1;
+        break;
+      case 'u':
+        unlink = 1;
+        break;
+      case 'v':
+        version = 1;
         break;
       default:
         usage(argv[0]);
@@ -65,6 +71,7 @@ int main(int argn, char **argv)
 
   if(version == 1)
   {
+    /* Don't you dare running it on a platform where byte != 8 bits */
     printf("%s version %.2f, off_t = %ld bits\n", argv[0], FFINDEX_VERSION, sizeof(off_t) * 8);
     return EXIT_SUCCESS;
   }
@@ -75,11 +82,43 @@ int main(int argn, char **argv)
     return EXIT_FAILURE;
   }
 
+  if(append && unlink)
+  {
+    fprintf(stderr, "ERROR: append (-a) and unlink (-u) are mutually exclusive");
+    return EXIT_FAILURE;
+  }
+
   char *data_filename  = argv[optind++];
   char *index_filename = argv[optind++];
   FILE *data_file, *index_file;
 
   size_t offset = 0;
+
+  /* Unlink entries  */
+  if(unlink)
+  {
+    index_file = fopen(index_filename, "a+");
+    if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
+
+    ffindex_index_t* index = ffindex_index_parse(index_file, 0);
+    if(index == NULL) { perror("ffindex_index_parse failed"); exit(EXIT_FAILURE); }
+    fclose(index_file);
+
+    /* For each list_file unlink */
+    if(list_filenames_index > 0)
+      for(int i = 0; i < list_filenames_index; i++)
+         index = ffindex_unlink(index, list_filenames[i]);
+
+    /* For each dir, insert all files into the index */
+    for(int i = optind; i < argn; i++)
+      index = ffindex_unlink(index, argv[i]);
+ 
+    index_file = fopen(index_filename, "w");
+    if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
+    err += ffindex_write(index, index_file);
+    return EXIT_SUCCESS;
+  }
+
 
   /* open index and data file, seek to end if needed */
   if(append)
@@ -105,6 +144,7 @@ int main(int argn, char **argv)
     if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
   }
 
+
   /* For each list_file insert */
   if(list_filenames_index > 0)
     for(int i = 0; i < list_filenames_index; i++)
@@ -127,6 +167,7 @@ int main(int argn, char **argv)
     }
   fclose(data_file);
 
+  /* Sort the index entries and write back */
   if(sort)
   {
     rewind(index_file);

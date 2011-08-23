@@ -8,10 +8,10 @@ all: ffindex_get ffindex_build
 
 ffindex.o: ffindex.c ffindex.h fferror.h
 
-ffindex_get: libffindex.so libffindex.so.0.1 ffindex_get.o
+ffindex_get: libffindex.so libffindex.so.0.1 ffindex_get.o ffindex.h
 	$(CC) $(CFLAGS) -L. -lffindex ffindex.o ffindex_get.o -o $@ 
 
-ffindex_build: libffindex.so libffindex.so.0.1 ffindex_build.o
+ffindex_build: libffindex.so libffindex.so.0.1 ffindex_build.o ffindex.h
 	$(CC) $(CFLAGS) -L. -lffindex ffindex.o ffindex_build.o -o $@ 
 
 libffindex.so.0.1: ffindex.o fferror.o
@@ -22,9 +22,12 @@ libffindex.so: libffindex.so.0.1
 
 test:
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_build -s /tmp/test.data /tmp/test.ffindex ../test/data ../test/data2
-	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo | tee test.out
+	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo | tee /tmp/test.out
+	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_build -u /tmp/test.data /tmp/test.ffindex b
+	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo | tee /tmp/test-unlink.out
 	@echo ======== compare results =========
-	diff test.out test.should
+	diff /tmp/test.out test.should
+	diff /tmp/test-unlink.out test-unlink.should
 	@echo ======== error handling ==========
 	@echo
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_get  /tmp/test.data /tmp/test.ffindex nonexistquery b foo || echo

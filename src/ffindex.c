@@ -88,7 +88,7 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
 
 
 /* Insert one file into ffindex */
-int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, char *path, char *name)
+int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, const char *path, char *name)
 {
     int myerrno = 0;
 
@@ -173,6 +173,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
     num_max_entries = FFINDEX_MAX_INDEX_ENTRIES_DEFAULT;
   size_t nbytes = sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * num_max_entries);
   ffindex_index_t *index = (ffindex_index_t *)malloc(nbytes);
+  index->num_max_entries = num_max_entries;
   if(index == NULL)
   {
     fferror_print(__FILE__, __LINE__, __func__, "malloc failed");
@@ -236,13 +237,24 @@ void ffindex_sort_index_file(ffindex_index_t *index)
 
 int ffindex_write(ffindex_index_t* index, FILE* index_file)
 {
-  for(int i = 0; i < index->n_entries; i++)
+  for(size_t i = 0; i < index->n_entries; i++)
   {
     ffindex_entry_t ffindex_entry = index->entries[i];
     if(fprintf(index_file, "%s\t%ld\t%ld\n", ffindex_entry.name, ffindex_entry.offset, ffindex_entry.length) < 0)
       return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
+}
+
+
+ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char* entry_name)
+{
+  ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, entry_name);
+  if(entry == NULL)
+    return index;
+  memmove(entry, entry + 1, (index->entries + index->num_max_entries + 1) - (entry + 1));
+  index->n_entries--;
+  return index;
 }
 
 /* vim: ts=2 sw=2 et
