@@ -1,9 +1,21 @@
+* Copyright
+written by Andy Hauser <hauser@genzentrum.lmu.de>.
+Please add your name here if you distribute modified versions.
+
+Ffindex is provided under the Create Commons license "Attribution-ShareAlike
+3.0", which basically captures the spirit of the Gnu Public License (GPL).
+
+See:
+http://creativecommons.org/licenses/by-sa/3.0/
+
+
 * Overview
 
-The ffindex library provides an index structure for files, concatenating
-all provided files into one big data file and name and offset in a
-second index file.
-This avoids the overhead of using directories for file lookup.
+Ffindex is a very simple database for small files. The files are stored
+concatenated in one big data file, seperated by '\0'. A second file
+contains a plain text index, giving name, offset and length of of the small
+files. The lookup is currently done with a binary search on an array
+made from the index file.
 
 * Installation
  
@@ -14,6 +26,10 @@ $ INSTALL_DIR=.. make install
 $ cd ..
 
 * Usage
+
+Please note that before querying or unlinking entries ffindex it must be
+sorted, although you can add to it without. So either specify -s with
+ffindex_build or sorted later with ffindex_modify -s.
 
 Setup environment:
 $ export PATH="./bin:$PATH"
@@ -27,7 +43,6 @@ $ ./ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo
 
 Unlink (Remove reference from index) an entry:
 $ ./ffindex_modify -u /tmp/test.ffindex b
-
 
 Retrieve three entries, "b" should now be missing:
 $ ./ffindex_get /tmp/test.data /tmp/test.ffindex a b foo
