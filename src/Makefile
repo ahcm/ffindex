@@ -29,6 +29,7 @@ test:
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo | tee /tmp/test.out
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_modify -u /tmp/test.ffindex b
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo | tee /tmp/test-unlink.out
+	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_build -a -s /tmp/test.data /tmp/test.ffindex ../test/testfile
 	@echo ======== compare results =========
 	diff /tmp/test.out test.should
 	diff /tmp/test-unlink.out test-unlink.should

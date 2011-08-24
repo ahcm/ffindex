@@ -31,7 +31,7 @@
 
 void usage(char *program_name)
 {
-    fprintf(stderr, "USAGE: %s [-a|-v] [-s] [-f file]* data_filename index_filename [dirs_to_index ...]\n"
+    fprintf(stderr, "USAGE: %s [-a|-v] [-s] [-f file]* data_filename index_filename [dir_to_index|file]*\n"
                     "\t-a\tappend\n"
                     "\t-f file\tfile each line containing a filename to index\n"
                     "\t\t-f can be specified up to %d times\n"
@@ -136,13 +136,27 @@ int main(int argn, char **argv)
       }
     }
 
-  /* For each dir, insert all files into the index */
+  /* Insert files and directories into the index */
   for(int i = optind; i < argn; i++)
-    if(ffindex_insert_dir(data_file, index_file, &offset, argv[i]) < 0)
+  {
+    char *path = argv[i];
+    struct stat sb;
+    if(stat(path, &sb) == -1)
     {
-      perror(argv[i]);
-      err = -1;
+      fferror_print(__FILE__, __LINE__, __func__, path);
+      continue;
     }
+
+    if(S_ISDIR(sb.st_mode))
+    {
+      err = ffindex_insert_dir(data_file, index_file, &offset, path);
+      if(err < 0)fferror_print(__FILE__, __LINE__, __func__, path);
+    }
+    else if(S_ISREG(sb.st_mode))
+    {
+      ffindex_insert_file(data_file, index_file, &offset, path, path);
+    }
+  }
   fclose(data_file);
 
   /* Sort the index entries and write back */

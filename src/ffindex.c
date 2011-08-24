@@ -55,7 +55,11 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
 {
   DIR *dir = opendir(input_dir_name);
   if(dir == NULL)
+  {
+    fferror_print(__FILE__, __LINE__, __func__, input_dir_name);
     return -1;
+  }
+
   size_t input_dir_name_len = strnlen(input_dir_name, PATH_MAX);
   char path[PATH_MAX];
   strncpy(path, input_dir_name, NAME_MAX);
@@ -64,6 +68,7 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
     path[input_dir_name_len] = '/';
     input_dir_name_len += 1;
   }
+
   size_t offset = *start_offset;
   struct dirent *entry;
   while((entry = readdir(dir)) != NULL)
