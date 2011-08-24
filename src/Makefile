@@ -1,4 +1,4 @@
-INSTALL_DIR=..
+INSTALL_DIR?=..
 LANG=C
 CFLAGS+=-std=c99 -O3 -openmp -g -fPIC -Wall
 LDFLAGS+=-Wl,-z,defs

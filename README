@@ -10,7 +10,7 @@ This avoids the overhead of using directories for file lookup.
 $ cd src
 $ make
 $ make test
-$ make install
+$ INSTALL_DIR=.. make install
 $ cd ..
 
 * Usage
