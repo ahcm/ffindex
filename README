@@ -1,0 +1,34 @@
+* Overview
+
+The ffindex library provides an index structure for files, concatenating
+all provided files into one big data file and name and offset in a
+second index file.
+This avoids the overhead of using directories for file lookup.
+
+* Installation
+ 
+$ cd src
+$ make
+$ make test
+$ make install
+$ cd ..
+
+* Usage
+
+Setup environment:
+$ export PATH="./bin:$PATH"
+$ export LD_LIBRARY_PATH="./lib:$LD_LIBRARY_PATH"
+
+Build index from files in test/data and test/data2.
+$ ./ffindex_build -s /tmp/test.data /tmp/test.ffindex test/data test/data2
+
+Retrieve three entries:
+$ ./ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo
+
+Unlink (Remove reference from index) an entry:
+$ ./ffindex_modify -u /tmp/test.ffindex b
+
+
+Retrieve three entries, "b" should now be missing:
+$ ./ffindex_get /tmp/test.data /tmp/test.ffindex a b foo
+
