@@ -31,12 +31,11 @@
 
 void usage(char *program_name)
 {
-    fprintf(stderr, "USAGE: %s [-a|-u|-v] [-s] [-f file]* data_filename index_filename [dirs_to_index ...]\n"
+    fprintf(stderr, "USAGE: %s [-a|-v] [-s] [-f file]* data_filename index_filename [dirs_to_index ...]\n"
                     "\t-a\tappend\n"
                     "\t-f file\tfile each line containing a filename to index\n"
                     "\t\t-f can be specified up to %d times\n"
                     "\t-s\tsort index file\n"
-                    "\t-u\tunlink entry (remove from index only)\n"
                     "\t-v\tprint version and other info then exit\n", program_name, MAX_FILENAME_LIST_FILES);
 }
 
@@ -58,9 +57,6 @@ int main(int argn, char **argv)
         break;
       case 's':
         sort = 1;
-        break;
-      case 'u':
-        unlink = 1;
         break;
       case 'v':
         version = 1;
@@ -95,33 +91,6 @@ int main(int argn, char **argv)
   FILE *data_file, *index_file;
 
   size_t offset = 0;
-
-  /* Unlink entries  */
-  if(unlink)
-  {
-    index_file = fopen(index_filename, "a+");
-    if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
-
-    ffindex_index_t* index = ffindex_index_parse(index_file, 0);
-    if(index == NULL) { perror("ffindex_index_parse failed"); exit(EXIT_FAILURE); }
-    fclose(index_file);
-
-    /* For each list_file unlink */
-    if(list_filenames_index > 0)
-      for(int i = 0; i < list_filenames_index; i++)
-         index = ffindex_unlink(index, list_filenames[i]);
-
-    /* For each dir, insert all files into the index */
-    for(int i = optind; i < argn; i++)
-      index = ffindex_unlink(index, argv[i]);
- 
-    index_file = fopen(index_filename, "w");
-    if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
-    err += ffindex_write(index, index_file);
-
-    return EXIT_SUCCESS;
-  }
-
 
   /* open index and data file, seek to end if needed */
   if(append)
