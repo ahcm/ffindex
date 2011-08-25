@@ -55,3 +55,4 @@ install:
 	install libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so.0.1
 	ln -sf libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so
 	install ffindex.h $(INSTALL_DIR)/include/ffindex.h
+	install fferror.h $(INSTALL_DIR)/include/fferror.h

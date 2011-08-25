@@ -1,5 +1,6 @@
 * Copyright
-written by Andy Hauser <hauser@genzentrum.lmu.de>.
+
+FFindex was written by Andy Hauser <hauser@genzentrum.lmu.de>.
 Please add your name here if you distribute modified versions.
 
 Ffindex is provided under the Create Commons license "Attribution-ShareAlike
@@ -17,13 +18,17 @@ contains a plain text index, giving name, offset and length of of the small
 files. The lookup is currently done with a binary search on an array
 made from the index file.
 
+
 * Installation
  
 $ cd src
 $ make
 $ make test
+
+# Please use a sensible value for INSTALL_DIR, e.g. /usr/local or /opt/ffindex
+# or $HOME/ffindex.
 $ INSTALL_DIR=.. make install
-$ cd ..
+
 
 * Usage
 
@@ -32,18 +37,18 @@ sorted, although you can add to it without. So either specify -s with
 ffindex_build or sorted later with ffindex_modify -s.
 
 Setup environment:
-$ export PATH="./bin:$PATH"
-$ export LD_LIBRARY_PATH="./lib:$LD_LIBRARY_PATH"
+$ export PATH="$INSTALL_DIR/bin:$PATH"
+$ export LD_LIBRARY_PATH="$INSTALL_DIR/lib:$LD_LIBRARY_PATH"
 
 Build index from files in test/data and test/data2.
-$ ./ffindex_build -s /tmp/test.data /tmp/test.ffindex test/data test/data2
+$ ffindex_build -s /tmp/test.data /tmp/test.ffindex test/data test/data2
 
 Retrieve three entries:
-$ ./ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo
+$ ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo
 
 Unlink (Remove reference from index) an entry:
-$ ./ffindex_modify -u /tmp/test.ffindex b
+$ ffindex_modify -u /tmp/test.ffindex b
 
 Retrieve three entries, "b" should now be missing:
-$ ./ffindex_get /tmp/test.data /tmp/test.ffindex a b foo
+$ ffindex_get /tmp/test.data /tmp/test.ffindex a b foo
 
