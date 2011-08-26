@@ -24,7 +24,7 @@ libffindex.so: libffindex.so.0.1
 	ln -sf libffindex.so.0.1 libffindex.so
 
 test:
-	rm /tmp/test.data /tmp/test.ffindex
+	rm -f /tmp/test.data /tmp/test.ffindex
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_build -s /tmp/test.data /tmp/test.ffindex ../test/data ../test/data2
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_get  /tmp/test.data /tmp/test.ffindex a b foo | tee /tmp/test.out
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_modify -u /tmp/test.ffindex b
