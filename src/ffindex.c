@@ -39,9 +39,12 @@ int ffindex_insert_list_file(FILE *data_file, FILE *index_file, size_t *start_of
   char path[PATH_MAX];
   while(fgets(path, PATH_MAX, list_file) != NULL)
   {
-    size_t len = strnlen(path, PATH_MAX);
+    /* remove \n, assumes UNIX line endings! */
+    size_t len = strlen(path);
     len -= 1;
-    path[len] = '\0'; /* remove \n*/
+    if(path[len] == '\n')
+      path[len] = '\0';
+
     ffindex_insert_file(data_file, index_file, &offset, path, basename(path));
   }
   /* update return value */
