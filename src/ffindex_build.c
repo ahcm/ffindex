@@ -24,7 +24,7 @@
 
 
 #include "ffindex.h"
-#include "fferror.h"
+#include "ffutil.h"
 
 #define MAX_FILENAME_LIST_FILES 4096
 

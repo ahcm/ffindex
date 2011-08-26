@@ -24,10 +24,9 @@
 
 
 #include "ffindex.h"
-#include "fferror.h"
+#include "ffutil.h"
 
 #define MAX_FILENAME_LIST_FILES 4096
-
 
 void usage(char *program_name)
 {
@@ -107,13 +106,7 @@ int main(int argn, char **argv)
         /* unlink entries in file, one per line */
         char path[PATH_MAX];
         while(fgets(path, PATH_MAX, list_file) != NULL)
-        {
-          size_t len = strnlen(path, PATH_MAX);
-          len -= 1;
-          path[len] = '\0'; /* remove \n*/
-          printf("unlink %s\n", path);
-          index = ffindex_unlink(index, path);
-        }
+          index = ffindex_unlink(index, ffnchomp(path, strlen(path)));
       }
 
     /* unlink entries specified by args */

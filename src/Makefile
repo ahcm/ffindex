@@ -6,7 +6,7 @@ LDFLAGS+=-Wl,-z,defs
 
 all: ffindex_get ffindex_build ffindex_modify
 
-ffindex.o: ffindex.c ffindex.h fferror.h
+ffindex.o: ffindex.c ffindex.h ffutil.h
 
 ffindex_get: libffindex.so libffindex.so.0.1 ffindex_get.o ffindex.h
 	$(CC) $(CFLAGS) -L. -lffindex ffindex.o ffindex_get.o -o $@ 
@@ -17,8 +17,8 @@ ffindex_build: libffindex.so libffindex.so.0.1 ffindex_build.o ffindex.h
 ffindex_modify: libffindex.so libffindex.so.0.1 ffindex_modify.o ffindex.h
 	$(CC) $(CFLAGS) -L. -lffindex ffindex.o ffindex_modify.o -o $@ 
 
-libffindex.so.0.1: ffindex.o fferror.o
-	$(CC) $(LDFLAGS) -shared -Wl,-soname,libffindex.so.0.1 -o libffindex.so.0.1 ffindex.o fferror.o -lc
+libffindex.so.0.1: ffindex.o ffutil.o
+	$(CC) $(LDFLAGS) -shared -Wl,-soname,libffindex.so.0.1 -o libffindex.so.0.1 ffindex.o ffutil.o -lc
 
 libffindex.so: libffindex.so.0.1
 	ln -sf libffindex.so.0.1 libffindex.so
@@ -55,4 +55,4 @@ install:
 	install libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so.0.1
 	ln -sf libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so
 	install ffindex.h $(INSTALL_DIR)/include/ffindex.h
-	install fferror.h $(INSTALL_DIR)/include/fferror.h
+	install ffutil.h $(INSTALL_DIR)/include/ffutil.h

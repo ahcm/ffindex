@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 #include "ext/fmemopen.h" /* For OS not yet implementing this new standard function */
-#include "fferror.h"
+#include "ffutil.h"
 #include "ffindex.h"
 
 /* XXX Use page size? */
@@ -38,15 +38,8 @@ int ffindex_insert_list_file(FILE *data_file, FILE *index_file, size_t *start_of
   size_t offset = *start_offset;
   char path[PATH_MAX];
   while(fgets(path, PATH_MAX, list_file) != NULL)
-  {
-    /* remove \n, assumes UNIX line endings! */
-    size_t len = strlen(path);
-    len -= 1;
-    if(path[len] == '\n')
-      path[len] = '\0';
+    ffindex_insert_file(data_file, index_file, &offset, ffnchomp(path, strlen(path)), basename(path));
 
-    ffindex_insert_file(data_file, index_file, &offset, path, basename(path));
-  }
   /* update return value */
   *start_offset = offset;
   return 0;
@@ -63,7 +56,7 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
     return -1;
   }
 
-  size_t input_dir_name_len = strnlen(input_dir_name, PATH_MAX);
+  size_t input_dir_name_len = strlen(input_dir_name);
   char path[PATH_MAX];
   strncpy(path, input_dir_name, NAME_MAX);
   if(input_dir_name[input_dir_name_len - 1] != '/')

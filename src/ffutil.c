@@ -16,13 +16,26 @@
  */
 
 #include <stdio.h>
-#include "fferror.h"
+#include "ffutil.h"
 
 int fferror_print(char *sourcecode_filename, int line, const char *function_name, const char *message)
 {
-        int myerrno = errno;
-        char* errstr = strerror(myerrno);
-        fprintf(stderr, "%s:%d %s: %s: %s\n", sourcecode_filename , line, function_name, message, errstr);
-	return myerrno;
+  int myerrno = errno;
+  char* errstr = strerror(myerrno);
+  fprintf(stderr, "%s:%d %s: %s: %s\n", sourcecode_filename , line, function_name, message, errstr);
+  return myerrno;
 }
 
+
+/* remove \n, assumes UNIX line endings! */
+char* ffnchomp(char *s, size_t len)
+{
+  len -= 1;
+  if(len >= 0 && s[len] == '\n')
+    s[len] = '\0';
+
+  return s;
+}
+
+/* vim: ts=2 sw=2 et
+*/

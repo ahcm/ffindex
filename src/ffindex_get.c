@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 #include "ffindex.h"
-#include "fferror.h"
+#include "ffutil.h"
 
 
 int main(int argn, char **argv)

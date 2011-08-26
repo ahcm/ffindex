@@ -20,4 +20,8 @@
 
 
 int fferror_print(char *sourcecode_filename, int line, const char *function_name, const char *message);
-                                                                            
+
+char* ffnchomp(char *s, size_t len);
+
+/* vim: ts=2 sw=2 et
+*/
