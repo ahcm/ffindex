@@ -248,13 +248,16 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
 }
 
 
-ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char* entry_name)
+ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char* name_to_unlink)
 {
-  ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, entry_name);
+  ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, name_to_unlink);
   if(entry == NULL)
+  {
+    fprintf(stderr, "Warning: could not fine '%s'\n", name_to_unlink);
     return index;
+  }
   /* Move entries after the unlinked one to close the gap */
-  memmove(entry, entry + 1, (index->entries + index->num_max_entries + 1) - (entry + 1));
+  memmove(entry, entry + 1, ((index->entries + index->n_entries) - entry) * sizeof(ffindex_entry_t));
   index->n_entries--;
   return index;
 }
