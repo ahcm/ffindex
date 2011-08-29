@@ -99,7 +99,7 @@ int main(int argn, char **argv)
     if(list_filenames_index > 0)
       for(int i = 0; i < list_filenames_index; i++)
       {
-        printf("Unlinking entries from '%s\n'", list_filenames[i]);
+        printf("Unlinking entries from '%s'\n", list_filenames[i]);
         FILE *list_file = fopen(list_filenames[i], "r");
         if( list_file == NULL) { perror(list_filenames[i]); return EXIT_FAILURE; }
 
