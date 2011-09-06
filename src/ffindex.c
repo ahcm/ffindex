@@ -20,6 +20,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <search.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -183,7 +184,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 
   index->file = index_file;
   index->index_data = ffindex_mmap_data(index_file, &(index->index_data_size));
-  index->type = SORTED_FILE; /* Assume a sorted file for now */
+  index->type = SORTED_ARRAY; /* Assume a sorted file for now */
   int i = 0;
   char* d = index->index_data;
   char* end;
@@ -248,17 +249,109 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
 }
 
 
+ffindex_index_t* ffindex_unlink_entries(ffindex_index_t* index, char** sorted_names_to_unlink, int n_names)
+{
+  int i = index->n_entries - 1;
+  /* walk list of names to delete */
+  for(int n = n_names - 1; n >= 0;  n--)
+  {
+    char* name_to_unlink = sorted_names_to_unlink[n];
+    /* walk index entries */
+    for(; i >= 0; i--)
+    {
+      int cmp = strncmp(name_to_unlink, index->entries[i].name, FFINDEX_MAX_ENTRY_NAME_LENTH);
+      if(cmp == 0) /* found entry */
+      {
+        /* Move entries after the unlinked ones to close the gap */
+        size_t n_entries_to_move = index->n_entries - i - 1;
+        if(n_entries_to_move > 0) /* not last element of array */
+          memmove(index->entries + i, index->entries + i + 1, n_entries_to_move * sizeof(ffindex_entry_t));
+        index->n_entries--;
+        break;
+      }
+      else if(cmp > 0) /* not found */
+        break;
+    }
+  }
+
+  return index;
+}
+
+
 ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char* name_to_unlink)
 {
+  if(index->type == TREE)
+    return ffindex_tree_unlink(index, name_to_unlink);
   ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, name_to_unlink);
   if(entry == NULL)
   {
-    fprintf(stderr, "Warning: could not fine '%s'\n", name_to_unlink);
+    fprintf(stderr, "Warning: could not find '%s'\n", name_to_unlink);
     return index;
   }
   /* Move entries after the unlinked one to close the gap */
-  memmove(entry, entry + 1, ((index->entries + index->n_entries) - entry) * sizeof(ffindex_entry_t));
+  size_t n_entries_to_move = index->entries + index->n_entries - entry - 1;
+  if(n_entries_to_move > 0) /* not last element of array */
+    memmove(entry, entry + 1, n_entries_to_move * sizeof(ffindex_entry_t));
   index->n_entries--;
+  return index;
+}
+
+/* tree version */
+
+ffindex_entry_t *ffindex_tree_get_entry(ffindex_index_t* index, char* name)
+{
+  ffindex_entry_t search;
+  strncpy(search.name, name, FFINDEX_MAX_ENTRY_NAME_LENTH);
+  return (ffindex_entry_t *)tfind((const void *)&search, &index->tree_root, ffindex_compare_entries_by_name);
+}
+
+
+ffindex_index_t* ffindex_tree_unlink(ffindex_index_t* index, char* name_to_unlink)
+{
+  if(index->tree_root == NULL)
+  {
+    fferror_print(__FILE__, __LINE__, __func__, "tree is NULL");
+    return NULL;
+  }
+  ffindex_entry_t search;
+  strncpy(search.name, name_to_unlink, FFINDEX_MAX_ENTRY_NAME_LENTH);
+  tdelete((const void *)&search, &index->tree_root, ffindex_compare_entries_by_name);
+  return index;
+}
+
+ffindex_index_t* ffindex_index_as_tree(ffindex_index_t* index)
+{
+  index->tree_root = NULL;
+  for(size_t i = 0; i < index->n_entries; i++)
+  {
+    ffindex_entry_t entry = index->entries[i];
+    tsearch((const void *)&entry, &index->tree_root, ffindex_compare_entries_by_name);
+  }
+  index->type = TREE;
+  return index;
+}
+
+
+ffindex_index_t* ffindex_sync_from_tree(ffindex_index_t* index)
+{
+  int i = 0;
+  void action(const void *node, const VISIT which, const int depth)
+  {
+    switch (which)
+    {
+      case preorder:
+        break;
+      case endorder:
+        break;
+      case postorder:
+      case leaf:
+        index->entries[i++] = *(ffindex_entry_t *) node;
+        break;
+    }                                        
+  }
+  //assert(index->type == TREE);
+  twalk(index->tree_root, action);
+  index->n_entries = i;
   return index;
 }
 

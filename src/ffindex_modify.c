@@ -30,17 +30,18 @@
 
 void usage(char *program_name)
 {
-    fprintf(stderr, "USAGE: %s [-s|-u|-v] [-f file]* index_filename [filename]*\n"
+    fprintf(stderr, "USAGE: %s [-s|-u|-v] [-t] [-f file]* index_filename [filename]*\n"
                     "\t-f file\tfile each line containing a filename\n"
                     "\t\t-f can be specified up to %d times\n"
                     "\t-s\tsort index file\n"
+                    "\t-t\tuse tree\n"
                     "\t-u\tunlink entry (remove from index only)\n"
                     "\t-v\tprint version and other info then exit\n", program_name, MAX_FILENAME_LIST_FILES);
 }
 
 int main(int argn, char **argv)
 {
-  int sort = 0, unlink = 0, version = 0;
+  int sort = 0, unlink = 0, version = 0, use_tree;
   int opt, err = EXIT_SUCCESS;
   char* list_filenames[MAX_FILENAME_LIST_FILES];
   size_t list_filenames_index = 0;
@@ -53,6 +54,9 @@ int main(int argn, char **argv)
         break;
       case 's':
         sort = 1;
+        break;
+      case 't':
+        use_tree = 1;
         break;
       case 'u':
         unlink = 1;
@@ -91,28 +95,58 @@ int main(int argn, char **argv)
 
   fclose(index_file);
 
-
   /* Unlink entries */
   if(unlink)
   {
-    /* For each list_file unlink all entries */
-    if(list_filenames_index > 0)
-      for(int i = 0; i < list_filenames_index; i++)
-      {
-        printf("Unlinking entries from '%s'\n", list_filenames[i]);
-        FILE *list_file = fopen(list_filenames[i], "r");
-        if( list_file == NULL) { perror(list_filenames[i]); return EXIT_FAILURE; }
+    if(use_tree)
+    {
+      index = ffindex_index_as_tree(index);
+      /* For each list_file unlink all entries */
+      if(list_filenames_index > 0)
+        for(int i = 0; i < list_filenames_index; i++)
+        {
+          printf("Unlinking entries from '%s'\n", list_filenames[i]);
+          FILE *list_file = fopen(list_filenames[i], "r");
+          if( list_file == NULL) { perror(list_filenames[i]); return EXIT_FAILURE; }
 
-        /* unlink entries in file, one per line */
-        char path[PATH_MAX];
-        while(fgets(path, PATH_MAX, list_file) != NULL)
-          index = ffindex_unlink(index, ffnchomp(path, strlen(path)));
-      }
+          /* unlink entries in file, one per line */
+          char path[PATH_MAX];
+          while(fgets(path, PATH_MAX, list_file) != NULL)
+            index = ffindex_unlink(index, ffnchomp(path, strlen(path)));
+        }
+    }
+    else
+    {
+      char** sorted_names_to_unlink = malloc(FFINDEX_MAX_INDEX_ENTRIES_DEFAULT * sizeof(char *));
+      if(sorted_names_to_unlink == NULL)
+        fferror_print(__FILE__, __LINE__, __func__, "malloc failed");
+      /* For each list_file unlink all entries */
+      if(list_filenames_index > 0)
+        for(int i = 0; i < list_filenames_index; i++)
+        {
+          printf("Unlinking entries from '%s'\n", list_filenames[i]);
+          FILE *list_file = fopen(list_filenames[i], "r");
+          if( list_file == NULL) { perror(list_filenames[i]); return EXIT_FAILURE; }
+
+          /* unlink entries in file, one per line */
+          char path[PATH_MAX];
+          while(fgets(path, PATH_MAX, list_file) != NULL)
+            sorted_names_to_unlink[i++] = ffnchomp(strdup(path), strlen(path));
+          ffindex_unlink_entries(index, sorted_names_to_unlink, i);
+        }
+
+      /* unlink entries specified by args */
+      int y = 0;
+      for(int i = optind; i < argn; i++, y++)
+        sorted_names_to_unlink[y] = argv[i];
+      ffindex_unlink_entries(index, sorted_names_to_unlink, y);
+    }
 
     /* unlink entries specified by args */
-    for(int i = optind; i < argn; i++)
-      index = ffindex_unlink(index, argv[i]);
+//    for(int i = optind; i < argn; i++)
+//      index = ffindex_unlink(index, argv[i]);
  
+    //index = ffindex_sync_from_tree(index);
   }
 
   /* Sort the index entries and write back */
