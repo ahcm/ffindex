@@ -239,6 +239,10 @@ void ffindex_sort_index_file(ffindex_index_t *index)
 
 int ffindex_write(ffindex_index_t* index, FILE* index_file)
 {
+  /* Use tree if available */
+  if(index->type == TREE)
+    return ffindex_tree_write(index, index_file);
+
   for(size_t i = 0; i < index->n_entries; i++)
   {
     ffindex_entry_t ffindex_entry = index->entries[i];
@@ -280,8 +284,10 @@ ffindex_index_t* ffindex_unlink_entries(ffindex_index_t* index, char** sorted_na
 
 ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char* name_to_unlink)
 {
+  /* Use tree if available */
   if(index->type == TREE)
     return ffindex_tree_unlink(index, name_to_unlink);
+
   ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, name_to_unlink);
   if(entry == NULL)
   {
@@ -324,19 +330,22 @@ ffindex_index_t* ffindex_index_as_tree(ffindex_index_t* index)
   index->tree_root = NULL;
   for(size_t i = 0; i < index->n_entries; i++)
   {
-    ffindex_entry_t entry = index->entries[i];
-    tsearch((const void *)&entry, &index->tree_root, ffindex_compare_entries_by_name);
+    ffindex_entry_t *entry = &index->entries[i];
+    tsearch((const void *)entry, &index->tree_root, ffindex_compare_entries_by_name);
+    //entry = *(ffindex_entry_t **)tsearch((const void *)entry, &index->tree_root, ffindex_compare_entries_by_name);
+    //printf("entry find: %s\n", entry->name); 
   }
   index->type = TREE;
   return index;
 }
 
 
-ffindex_index_t* ffindex_sync_from_tree(ffindex_index_t* index)
+int ffindex_tree_write(ffindex_index_t* index, FILE* index_file)
 {
-  int i = 0;
+  int ret = EXIT_SUCCESS;
   void action(const void *node, const VISIT which, const int depth)
   {
+    ffindex_entry_t *entry;
     switch (which)
     {
       case preorder:
@@ -345,14 +354,14 @@ ffindex_index_t* ffindex_sync_from_tree(ffindex_index_t* index)
         break;
       case postorder:
       case leaf:
-        index->entries[i++] = *(ffindex_entry_t *) node;
+        entry = *(ffindex_entry_t **) node;
+        if(fprintf(index_file, "%s\t%ld\t%ld\n", entry->name, entry->offset, entry->length) < 0)
+          ret = EXIT_FAILURE;
         break;
     }                                        
   }
-  //assert(index->type == TREE);
   twalk(index->tree_root, action);
-  index->n_entries = i;
-  return index;
+  return ret;
 }
 
 /* vim: ts=2 sw=2 et

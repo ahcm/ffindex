@@ -45,7 +45,7 @@ int main(int argn, char **argv)
   int opt, err = EXIT_SUCCESS;
   char* list_filenames[MAX_FILENAME_LIST_FILES];
   size_t list_filenames_index = 0;
-  while ((opt = getopt(argn, argv, "suvf:")) != -1)
+  while ((opt = getopt(argn, argv, "stuvf:")) != -1)
   {
     switch (opt)
     {
@@ -100,7 +100,9 @@ int main(int argn, char **argv)
   {
     if(use_tree)
     {
+      /* Build tree */
       index = ffindex_index_as_tree(index);
+
       /* For each list_file unlink all entries */
       if(list_filenames_index > 0)
         for(int i = 0; i < list_filenames_index; i++)
@@ -114,6 +116,10 @@ int main(int argn, char **argv)
           while(fgets(path, PATH_MAX, list_file) != NULL)
             index = ffindex_unlink(index, ffnchomp(path, strlen(path)));
         }
+
+      /* unlink entries specified by args */
+      for(int i = optind; i < argn; i++)
+        index = ffindex_unlink(index, argv[i]);
     }
     else
     {
@@ -140,22 +146,16 @@ int main(int argn, char **argv)
       for(int i = optind; i < argn; i++, y++)
         sorted_names_to_unlink[y] = argv[i];
       ffindex_unlink_entries(index, sorted_names_to_unlink, y);
+
+      /* Sort the index entries and write back */
+      if(sort)
+      {
+        ffindex_sort_index_file(index);
+        index_file = fopen(index_filename, "w");
+        if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
+        err += ffindex_write(index, index_file);
+      }
     }
-
-    /* unlink entries specified by args */
-//    for(int i = optind; i < argn; i++)
-//      index = ffindex_unlink(index, argv[i]);
- 
-    //index = ffindex_sync_from_tree(index);
-  }
-
-  /* Sort the index entries and write back */
-  if(sort)
-  {
-    ffindex_sort_index_file(index);
-    index_file = fopen(index_filename, "w");
-    if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
-    err += ffindex_write(index, index_file);
   }
 
   /* Write index back */
