@@ -21,7 +21,7 @@
 #define FFINDEX_MAX_INDEX_ENTRIES_DEFAULT 6000000
 #define FFINDEX_MAX_ENTRY_NAME_LENTH 56
 
-enum ffindex_type {PLAIN_FILE, SORTED_FILE, SORTED_ARRAY, TREE};
+enum ffindex_type { PLAIN_FILE, SORTED_FILE, SORTED_ARRAY, TREE };
 
 typedef struct ffindex_entry {
   size_t offset;
@@ -71,3 +71,5 @@ ffindex_index_t* ffindex_tree_unlink(ffindex_index_t* index, char* name_to_unlin
 ffindex_index_t* ffindex_unlink_entries(ffindex_index_t* index, char** sorted_names_to_unlink, int n_names);
 
 int ffindex_tree_write(ffindex_index_t* index, FILE* index_file);
+
+int ffindex_insert_filestream(FILE *data_file, FILE *index_file, size_t *offset, FILE* file, char *name);

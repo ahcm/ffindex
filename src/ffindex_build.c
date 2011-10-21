@@ -33,6 +33,8 @@ void usage(char *program_name)
 {
     fprintf(stderr, "USAGE: %s [-a|-v] [-s] [-f file]* data_filename index_filename [dir_to_index|file]*\n"
                     "\t-a\tappend\n"
+                    "\t-d a second ffindex data file for inserting/appending\n"
+                    "\t-i a second ffindex index file for insterting/appending\n"
                     "\t-f file\tfile each line containing a filename to index\n"
                     "\t\t-f can be specified up to %d times\n"
                     "\t-s\tsort index file\n"
@@ -44,13 +46,23 @@ int main(int argn, char **argv)
   int append = 0, sort = 0, unlink = 0, version = 0;
   int opt, err = EXIT_SUCCESS;
   char* list_filenames[MAX_FILENAME_LIST_FILES];
+  char* list_ffindex_data[MAX_FILENAME_LIST_FILES];
+  char* list_ffindex_index[MAX_FILENAME_LIST_FILES];
+  size_t list_ffindex_data_index = 0;
+  size_t list_ffindex_index_index = 0;
   size_t list_filenames_index = 0;
-  while ((opt = getopt(argn, argv, "asuvf:")) != -1)
+  while ((opt = getopt(argn, argv, "asuvd:f:i:")) != -1)
   {
     switch (opt)
     {
       case 'a':
         append = 1;
+        break;
+      case 'd':
+        list_ffindex_data[list_ffindex_data_index++] = optarg;
+        break;
+      case 'i':
+        list_ffindex_index[list_ffindex_index_index++] = optarg;
         break;
       case 'f':
         list_filenames[list_filenames_index++] = optarg;
@@ -82,7 +94,13 @@ int main(int argn, char **argv)
 
   if(append && unlink)
   {
-    fprintf(stderr, "ERROR: append (-a) and unlink (-u) are mutually exclusive");
+    fprintf(stderr, "ERROR: append (-a) and unlink (-u) are mutually exclusive\n");
+    return EXIT_FAILURE;
+  }
+
+  if(list_ffindex_data_index != list_ffindex_index_index)
+  {
+    fprintf(stderr, "ERROR: -d and -i must be specified pairwise\n");
     return EXIT_FAILURE;
   }
 
@@ -135,6 +153,26 @@ int main(int argn, char **argv)
         err = -1;
       }
     }
+
+  /* Append other ffindexes */
+  if(list_ffindex_data_index > 0)
+  {
+    for(int i = 0; i < list_ffindex_data_index; i++)
+    {
+      FILE* data_file_to_add  = fopen(list_ffindex_data[i], "r");  if(  data_file_to_add == NULL) { perror(list_ffindex_data[i]); return EXIT_FAILURE; }
+      FILE* index_file_to_add = fopen(list_ffindex_index[i], "r"); if( index_file_to_add == NULL) { perror(list_ffindex_index[i]); return EXIT_FAILURE; }
+      size_t data_size;
+      char *data_to_add = ffindex_mmap_data(data_file_to_add, &data_size);
+      ffindex_index_t* index_to_add = ffindex_index_parse(index_file_to_add, 0);
+      for(size_t entry_i = 0; entry_i < index_to_add->n_entries; entry_i++)
+      {
+        ffindex_entry_t *entry = &index_to_add->entries[entry_i];
+        FILE *file = ffindex_fopen(data_to_add, index_to_add, entry->name);
+        ffindex_insert_filestream(data_file, index_file, &offset, file, entry->name);
+      }
+    }
+  }
+
 
   /* Insert files and directories into the index */
   for(int i = optind; i < argn; i++)

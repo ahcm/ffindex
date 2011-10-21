@@ -89,15 +89,20 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
 }
 
 
-/* Insert one file into ffindex */
+/* Insert one file by path into ffindex */
 int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, const char *path, char *name)
 {
-    int myerrno = 0;
-
     FILE *file = fopen(path, "r");
     if(file == NULL)
-      goto EXCEPTION_ffindex_insert_file;
+      return errno;
 
+    return ffindex_insert_filestream(data_file, index_file, offset, file, name);
+}
+
+/* Insert one file by handle into ffindex */
+int ffindex_insert_filestream(FILE *data_file, FILE *index_file, size_t *offset, FILE* file, char *name)
+{
+    int myerrno = 0;
     /* copy and paste file to data file */
     char buffer[FFINDEX_BUFFER_SIZE];
     size_t offset_before = *offset;
@@ -107,7 +112,7 @@ int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, const
       size_t write_size = fwrite(buffer, sizeof(char), read_size, data_file);
       *offset += write_size;
       if(read_size != write_size)
-        fferror_print(__FILE__, __LINE__, __func__, path);
+        fferror_print(__FILE__, __LINE__, __func__, name);
     }
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
