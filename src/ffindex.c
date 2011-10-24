@@ -96,7 +96,9 @@ int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, const
     if(file == NULL)
       return errno;
 
-    return ffindex_insert_filestream(data_file, index_file, offset, file, name);
+    int ret = ffindex_insert_filestream(data_file, index_file, offset, file, name);
+    fclose(file);
+    return ret;
 }
 
 /* Insert one file by handle into ffindex */
@@ -128,13 +130,11 @@ int ffindex_insert_filestream(FILE *data_file, FILE *index_file, size_t *offset,
     if(ferror(file) != 0)
       goto EXCEPTION_ffindex_insert_file;
 
-    fclose(file);
     return myerrno;
 
 EXCEPTION_ffindex_insert_file:
     {
       fferror_print(__FILE__, __LINE__, __func__, "");
-      fclose(file);
       return myerrno;
     }
 }
