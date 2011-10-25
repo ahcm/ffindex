@@ -33,6 +33,13 @@
 /* XXX Use page size? */
 #define FFINDEX_BUFFER_SIZE 4096
 
+char* ffindex_copyright_text = "Designed and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.";
+
+char* ffindex_copyright()
+{
+  return ffindex_copyright_text;
+}
+
 /* Insert all file from directory into ffindex */
 int ffindex_insert_list_file(FILE *data_file, FILE *index_file, size_t *start_offset, FILE *list_file)
 {

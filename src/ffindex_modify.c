@@ -36,7 +36,9 @@ void usage(char *program_name)
                     "\t-s\tsort index file\n"
                     "\t-t\tuse tree\n"
                     "\t-u\tunlink entry (remove from index only)\n"
-                    "\t-v\tprint version and other info then exit\n", program_name, MAX_FILENAME_LIST_FILES);
+                    "\t-v\tprint version and other info then exit\n"
+                    "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n",
+                    program_name, MAX_FILENAME_LIST_FILES);
 }
 
 int main(int argn, char **argv)

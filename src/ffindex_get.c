@@ -26,7 +26,9 @@ int main(int argn, char **argv)
 {
   if(argn < 3)
   {
-    fprintf(stderr, "USAGE: %s data_filename index_filename filename(s)\n", argv[0]);
+    fprintf(stderr, "USAGE: %s data_filename index_filename filename(s)\n"
+                    "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n",
+                    argv[0]);
     return -1;
   }
   char *data_filename  = argv[1];

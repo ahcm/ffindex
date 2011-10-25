@@ -38,7 +38,8 @@ void usage(char *program_name)
                     "\t-f file\tfile each line containing a filename to index\n"
                     "\t\t-f can be specified up to %d times\n"
                     "\t-s\tsort index file\n"
-                    "\t-v\tprint version and other info then exit\n", program_name, MAX_FILENAME_LIST_FILES);
+                    "\t-v\tprint version and other info then exit\n"
+                    "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n", program_name, MAX_FILENAME_LIST_FILES);
 }
 
 int main(int argn, char **argv)
