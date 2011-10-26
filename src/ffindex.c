@@ -132,7 +132,7 @@ int ffindex_insert_filestream(FILE *data_file, FILE *index_file, size_t *offset,
       goto EXCEPTION_ffindex_insert_file;
 
     /* write index entry */
-    fprintf(index_file, "%s\t%ld\t%ld\n", name, offset_before, *offset - offset_before);
+    fprintf(index_file, "%s\t%zd\t%zd\n", name, offset_before, *offset - offset_before);
 
     if(ferror(file) != 0)
       goto EXCEPTION_ffindex_insert_file;
@@ -258,7 +258,7 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
   for(size_t i = 0; i < index->n_entries; i++)
   {
     ffindex_entry_t ffindex_entry = index->entries[i];
-    if(fprintf(index_file, "%s\t%ld\t%ld\n", ffindex_entry.name, ffindex_entry.offset, ffindex_entry.length) < 0)
+    if(fprintf(index_file, "%s\t%zd\t%zd\n", ffindex_entry.name, ffindex_entry.offset, ffindex_entry.length) < 0)
       return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
@@ -367,7 +367,7 @@ int ffindex_tree_write(ffindex_index_t* index, FILE* index_file)
       case postorder:
       case leaf:
         entry = *(ffindex_entry_t **) node;
-        if(fprintf(index_file, "%s\t%ld\t%ld\n", entry->name, entry->offset, entry->length) < 0)
+        if(fprintf(index_file, "%s\t%zd\t%zd\n", entry->name, entry->offset, entry->length) < 0)
           ret = EXIT_FAILURE;
         break;
     }                                        
