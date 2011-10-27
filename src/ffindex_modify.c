@@ -76,7 +76,7 @@ int main(int argn, char **argv)
   if(version == 1)
   {
     /* Don't you dare running it on a platform where byte != 8 bits */
-    printf("%s version %.2f, off_t = %d bits\n", argv[0], FFINDEX_VERSION, sizeof(off_t) * 8);
+    printf("%s version %.2f, off_t = %zd bits\n", argv[0], FFINDEX_VERSION, sizeof(off_t) * 8);
     return EXIT_SUCCESS;
   }
 
