@@ -57,7 +57,7 @@ clean:
 
 install:
 	mkdir -p $(INSTALL_DIR)/bin
-	mkdir -p $(INSTALL_DIR)/lib
+	mkdir -p $(INSTALL_DIR)/$(libdir)
 	mkdir -p $(INSTALL_DIR)/include
 	install ffindex_get $(INSTALL_DIR)/bin/ffindex_get
 	install ffindex_build $(INSTALL_DIR)/bin/ffindex_build
