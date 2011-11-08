@@ -29,6 +29,6 @@ make install INSTALL_DIR=%{buildroot}%{_prefix}
 /usr/bin/ffindex_modify
 /usr/include/ffindex.h
 /usr/include/ffutil.h
-/usr/lib/libffindex.a
-/usr/lib/libffindex.so
-/usr/lib/libffindex.so.0.1
+%{_libdir}/libffindex.a
+%{_libdir}/libffindex.so
+%{_libdir}/libffindex.so.0.1
