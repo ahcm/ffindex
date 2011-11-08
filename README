@@ -12,11 +12,11 @@ http://creativecommons.org/licenses/by-sa/3.0/
 
 * Overview
 
-Ffindex is a very simple database for small files. The files are stored
-concatenated in one big data file, seperated by '\0'. A second file
-contains a plain text index, giving name, offset and length of of the small
-files. The lookup is currently done with a binary search on an array
-made from the index file.
+FFindex is a very simple index/database for huge amounts of small files. The
+files are stored concatenated in one big data file, seperated by '\0'. A second
+file contains a plain text index, giving name, offset and length of of the
+small files. The lookup is currently done with a binary search on an array made
+from the index file.
 
 
 * Installation
