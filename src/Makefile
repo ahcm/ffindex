@@ -1,4 +1,5 @@
 INSTALL_DIR?=..
+libdir=`([[ -d /usr/lib64 ]] && echo lib64) || echo lib`
 LANG=C
 CFLAGS+=-std=c99 -openmp -g -fPIC -Wall
 ifdef FFINDEX_STATIC
@@ -61,8 +62,8 @@ install:
 	install ffindex_get $(INSTALL_DIR)/bin/ffindex_get
 	install ffindex_build $(INSTALL_DIR)/bin/ffindex_build
 	install ffindex_modify $(INSTALL_DIR)/bin/ffindex_modify
-	install libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so.0.1
-	install libffindex.a $(INSTALL_DIR)/lib/libffindex.a
-	ln -sf libffindex.so.0.1 $(INSTALL_DIR)/lib/libffindex.so
+	install libffindex.so.0.1 $(INSTALL_DIR)/$(libdir)/libffindex.so.0.1
+	install libffindex.a $(INSTALL_DIR)/$(libdir)/libffindex.a
+	ln -sf libffindex.so.0.1 $(INSTALL_DIR)/$(libdir)/libffindex.so
 	install ffindex.h $(INSTALL_DIR)/include/ffindex.h
 	install ffutil.h $(INSTALL_DIR)/include/ffutil.h
