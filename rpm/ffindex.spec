@@ -19,7 +19,7 @@ from the index file.
 make
 
 %install
-make install INSTALL_DIR=/usr
+make install INSTALL_DIR=%{buildroot}%{_prefix}
 
 %files
 %doc README LICENSE
@@ -27,6 +27,8 @@ make install INSTALL_DIR=/usr
 /usr/bin/ffindex_build
 /usr/bin/ffindex_get
 /usr/bin/ffindex_modify
+/usr/include/ffindex.h
+/usr/include/ffutil.h
 /usr/lib/libffindex.a
 /usr/lib/libffindex.so
 /usr/lib/libffindex.so.0.1
