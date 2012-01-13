@@ -20,6 +20,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <libgen.h>
 #include <search.h>
 #include <stdio.h>
 #include <stdlib.h>
