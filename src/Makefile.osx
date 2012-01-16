@@ -1,10 +1,10 @@
 INSTALL_DIR=..
 LANG=C
-CFLAGS+=-std=c99 -O3 -g -fPIC -Wall
+CFLAGS+=-std=c99 -O3 -g -fPIC -Wall -fnested-functions
 #LDFLAGS+=-Wl,-z,defs
 #-Wl,--version-script=libffindex.map
 
-all: ffindex_get ffindex_build ffindex_modify
+all: ext/fmemopen.o libffindex.a ffindex_get ffindex_build ffindex_modify
 
 ext/fmemopen.o: ext/fmemopen.c
 	cd ext && make
@@ -25,6 +25,9 @@ libffindex.so.0.1: ffindex.o ext/fmemopen.o ffutil.o
 
 libffindex.so: libffindex.so.0.1
 	ln -sf libffindex.so.0.1 libffindex.so
+
+libffindex.a: ffindex.o ffutil.o
+	ar rcs libffindex.a ffutil.o ffindex.o  ext/fmemopen.o
 
 test:
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_build -s test.data test.ffindex ../test/data ../test/data2
