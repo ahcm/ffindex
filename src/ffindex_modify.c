@@ -34,7 +34,7 @@ void usage(char *program_name)
                     "\t-f file\tfile each line containing a filename\n"
                     "\t\t-f can be specified up to %d times\n"
                     "\t-s\tsort index file\n"
-                    "\t-t\tuse tree\n"
+                    "\t-t\tuse tree (default, will be removed soon)\n"
                     "\t-u\tunlink entry (remove from index only)\n"
                     "\t-v\tprint version and other info then exit\n"
                     "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n",
@@ -43,7 +43,7 @@ void usage(char *program_name)
 
 int main(int argn, char **argv)
 {
-  int sort = 0, unlink = 0, version = 0, use_tree;
+  int sort = 0, unlink = 0, version = 0, use_tree = 1;
   int opt, err = EXIT_SUCCESS;
   char* list_filenames[MAX_FILENAME_LIST_FILES];
   size_t list_filenames_index = 0;
