@@ -6,14 +6,15 @@ else
 MFILE=Makefile
 endif
 
+.PHONY: clean install deinstall clean
 all:
-	cd src ; make -f $(MFILE)
+	$(MAKE) -C src -f $(MFILE)
 
 install:
-	cd src ; make install
+	$(MAKE) -C src install
 
 deinstall:
-	cd src ; make deinstall
+	$(MAKE) -C src deinstall
 
 clean:
-	cd src ; make clean
+	$(MAKE) -C src clean
