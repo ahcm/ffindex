@@ -3,8 +3,8 @@
 FFindex was written by Andy Hauser <hauser@genzentrum.lmu.de>.
 Please add your name here if you distribute modified versions.
 
-FFindex is provided under the Create Commons license "Attribution-ShareAlike
-3.0", which basically captures the spirit of the Gnu Public License (GPL).
+FFindex is provided under the Create Commons license "Attribution-ShareAlike 3.0",
+which basically captures the spirit of the Gnu Public License (GPL).
 
 See:
 http://creativecommons.org/licenses/by-sa/3.0/
@@ -29,13 +29,13 @@ On OS X use for the first make line:
 $ make -f Makefile.osx
 
 # Please use a sensible value for INSTALL_DIR, e.g. /usr/local or /opt/ffindex
-# or $HOME/ffindex.
-$ INSTALL_DIR=.. make install
+# or $HOME/ffindex instead of "..".
+$ make install INSTALL_DIR=.. 
 
 
 * Usage
 
-Please note that before querying or unlinking entries ffindex it must be
+Please note that before querying or unlinking entries a ffindex must be
 sorted, although you can add to it without. So either specify -s with
 ffindex_build or sorted later with ffindex_modify -s.
 
