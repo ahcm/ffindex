@@ -92,20 +92,18 @@ int main(int argn, char **argv)
   char *fasta_data = ffindex_mmap_data(fasta_file, &fasta_size);
   size_t offset = 0;
   size_t from_length = 0;
-  char *from_start = fasta_data + 1; // position after first ">"
   char name[FFINDEX_MAX_ENTRY_NAME_LENTH];
-  int i = 1;
-  for(size_t fasta_offset = 1; fasta_offset < fasta_size; from_start++)
+  int seq_id = 1;
+  for(size_t fasta_offset = 1; fasta_offset < fasta_size; fasta_offset++) // position after first ">"
   {
-    from_length = 0;
-    while(fasta_offset < fasta_size && *from_start != '>')
+    from_length = 1;
+    while(fasta_offset < fasta_size && !(*(fasta_data + fasta_offset) == '>' && *(fasta_data + fasta_offset - 1) == '\n'))
     {
-      from_start++;
-      from_length++;
       fasta_offset++;
+      from_length++;
     }
-    sprintf(name, "%d", i++);
-    ffindex_insert_memory(data_file, index_file, &offset, from_start - from_length - 1, from_length + 1, name);
+    sprintf(name, "%d", seq_id++);
+    ffindex_insert_memory(data_file, index_file, &offset, fasta_data + (fasta_offset - from_length), from_length, name);
   }
   fclose(data_file);
 
