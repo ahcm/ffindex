@@ -41,6 +41,38 @@ char* ffindex_copyright()
   return ffindex_copyright_text;
 }
 
+
+/* Insert a memory chunk (string even without \0) into ffindex */
+int ffindex_insert_memory(FILE *data_file, FILE *index_file, size_t *offset, char *from_start, size_t from_length, char *name)
+{
+    int myerrno = 0;
+    size_t offset_before = *offset;
+    size_t write_size = fwrite(from_start, sizeof(char), from_length, data_file);
+    *offset += write_size;
+    if(from_length != write_size)
+      fferror_print(__FILE__, __LINE__, __func__, name);
+
+    /* Seperate by '\0' and thus also make sure at least one byte is written */
+    char buffer[1] = {'\0'};
+    fwrite(buffer, sizeof(char), 1, data_file);
+    *offset += 1;
+    if(ferror(data_file) != 0)
+      goto EXCEPTION_ffindex_insert_memory;
+
+    /* write index entry */
+    fprintf(index_file, "%s\t%zd\t%zd\n", name, offset_before, *offset - offset_before);
+
+
+    return myerrno;
+
+EXCEPTION_ffindex_insert_memory:
+    {
+      fferror_print(__FILE__, __LINE__, __func__, "");
+      return myerrno;
+    }
+}
+
+
 /* Insert all file from directory into ffindex */
 int ffindex_insert_list_file(FILE *data_file, FILE *index_file, size_t *start_offset, FILE *list_file)
 {

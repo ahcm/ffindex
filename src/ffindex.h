@@ -41,6 +41,7 @@ typedef struct ffindex_index {
   ffindex_entry_t entries[]; /* This array is as big as the excess memory allocated for this struct. */
 } ffindex_index_t;
 
+int ffindex_insert_memory(FILE *data_file, FILE *index_file, size_t *offset, char *from_start, size_t from_length, char *name);
 
 int ffindex_insert_file(FILE *data_file, FILE *index_file, size_t *offset, const char *path, char *name);
 
