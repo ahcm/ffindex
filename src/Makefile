@@ -1,7 +1,7 @@
 INSTALL_DIR?=..
 libdir=`([ -d /usr/lib64 ] && echo lib64) || echo lib`
 LANG=C
-CFLAGS+=-std=c99 -openmp -g -fPIC -Wall
+CFLAGS+=-std=c99 -O2 -openmp -g -fPIC -Wall
 ifdef FFINDEX_STATIC
 	LDFLAGS+=-static
 	FFINDEX_OBJECTS=libffindex.a
