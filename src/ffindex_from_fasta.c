@@ -91,13 +91,21 @@ int main(int argn, char **argv)
   size_t fasta_size;
   char *fasta_data = ffindex_mmap_data(fasta_file, &fasta_size);
   size_t offset = 0;
-  for(size_t fasta_offset = 0; fasta_offset < fasta_size; fasta_offset++)
+  size_t from_length = 0;
+  char *from_start = fasta_data + 1; // position after first ">"
+  char name[FFINDEX_MAX_ENTRY_NAME_LENTH];
+  int i = 1;
+  for(size_t fasta_offset = 1; fasta_offset < fasta_size; from_start++)
   {
-    // XXX
-    char *from_start = fasta_data + fasta_offset;
-    size_t from_length = 0;
-    char *name = "foo";
-    ffindex_insert_memory(data_file, index_file, &offset, from_start, from_length, name);
+    from_length = 0;
+    while(fasta_offset < fasta_size && *from_start != '>')
+    {
+      from_start++;
+      from_length++;
+      fasta_offset++;
+    }
+    sprintf(name, "%d", i++);
+    ffindex_insert_memory(data_file, index_file, &offset, from_start - from_length - 1, from_length + 1, name);
   }
   fclose(data_file);
 
