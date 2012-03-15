@@ -27,7 +27,7 @@ int main(int argn, char **argv)
   if(argn < 3)
   {
     fprintf(stderr, "USAGE: %s data_filename index_filename filename(s)\n"
-                    "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n",
+                    "\nDesigned and implemented by Andy Hauser <hauser@genzentrum.lmu.de>.\n",
                     argv[0]);
     return -1;
   }
@@ -53,6 +53,17 @@ int main(int argn, char **argv)
   for(int i = 3; i < argn; i++)
   {
     char *filename = argv[i];
+    char *filedata = ffindex_get(data, index, filename);
+    if(data == NULL)
+    {
+      errno = ENOENT; 
+      fferror_print(__FILE__, __LINE__, "ffindex_get key not found in index", filename);
+    }
+    else
+      fputs(filedata, stdout);
+
+    /* Alternative code using (slower) ffindex_fopen */
+    /*
     FILE *file = ffindex_fopen(data, index, filename);
     if(file == NULL)
     {
@@ -63,8 +74,9 @@ int main(int argn, char **argv)
     {
       char line[LINE_MAX];
       while(fgets(line, LINE_MAX, file) != NULL)
-        printf("%s", line); /* XXX Mask nonprintable characters */
+        printf("%s", line);
     }
+    */
   }
 
   return 0;
