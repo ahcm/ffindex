@@ -255,12 +255,23 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 }
 
 
-/* Using a function fot this looks like overhead. But a more advanced data format,
+/* Using a function for this looks like overhead. But a more advanced data format,
  * say a compressed one, can do it's magic here. 
  */
 char* ffindex_get_filedata(char* data, size_t offset)
 {
   return data + offset;
+}
+
+
+char* ffindex_get(char *data, ffindex_index_t *index, char *filename)
+{
+  ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, filename);
+
+  if(entry == NULL)
+    return NULL;
+
+  return ffindex_get_filedata(data, entry->offset);
 }
 
 

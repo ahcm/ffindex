@@ -55,6 +55,8 @@ char* ffindex_mmap_data(FILE *file, size_t* size);
 
 char* ffindex_get_filedata(char* data, size_t offset);
 
+char* ffindex_get(char *data, ffindex_index_t *index, char *filename);
+
 ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries);
 
 ffindex_entry_t* ffindex_bsearch_get_entry(ffindex_index_t *index, char *name);
