@@ -53,7 +53,7 @@ int main(int argn, char **argv)
   for(int i = 3; i < argn; i++)
   {
     char *filename = argv[i];
-    char *filedata = ffindex_get(data, index, filename);
+    char *filedata = ffindex_get_data_by_name(data, index, filename);
     if(data == NULL)
     {
       errno = ENOENT; 

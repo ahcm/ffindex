@@ -34,7 +34,7 @@
 /* XXX Use page size? */
 #define FFINDEX_BUFFER_SIZE 4096
 
-char* ffindex_copyright_text = "Designed and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.";
+char* ffindex_copyright_text = "Designed and implemented by Andy Hauser <hauser@genzentrum.lmu.de>.";
 
 char* ffindex_copyright()
 {
@@ -254,24 +254,39 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   return index;
 }
 
+ffindex_entry_t* ffindex_get_entry_by_index(ffindex_index_t *index, size_t entry_index)
+{
+  return &index->entries[entry_index];
+}
 
 /* Using a function for this looks like overhead. But a more advanced data format,
  * say a compressed one, can do it's magic here. 
  */
-char* ffindex_get_filedata(char* data, size_t offset)
+char* ffindex_get_data_by_offset(char* data, size_t offset)
 {
   return data + offset;
 }
 
 
-char* ffindex_get(char *data, ffindex_index_t *index, char *filename)
+char* ffindex_get_data_by_name(char *data, ffindex_index_t *index, char *name)
 {
-  ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, filename);
+  ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, name);
 
   if(entry == NULL)
     return NULL;
 
-  return ffindex_get_filedata(data, entry->offset);
+  return ffindex_get_data_by_offset(data, entry->offset);
+}
+
+
+char* ffindex_get_data_by_index(char *data, ffindex_index_t *index, size_t entry_index)
+{
+  ffindex_entry_t* entry = ffindex_get_entry_by_index(index, entry_index);
+
+  if(entry == NULL)
+    return NULL;
+
+  return ffindex_get_data_by_offset(data, entry->offset);
 }
 
 
@@ -282,7 +297,7 @@ FILE* ffindex_fopen(char *data, ffindex_index_t *index, char *filename)
   if(entry == NULL)
     return NULL;
 
-  char *filedata = ffindex_get_filedata(data, entry->offset);
+  char *filedata = ffindex_get_data_by_offset(data, entry->offset);
   return fmemopen(filedata, entry->length, "r");
 }
 

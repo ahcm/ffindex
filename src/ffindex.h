@@ -49,13 +49,17 @@ int ffindex_insert_list_file(FILE *data_file, FILE *index_file, size_t *start_of
 
 int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *offset, char *input_dir_name);
 
-FILE* ffindex_fopen(char *data, ffindex_index_t *index, char *filename);
+FILE* ffindex_fopen(char *data, ffindex_index_t *index, char *name);
 
 char* ffindex_mmap_data(FILE *file, size_t* size);
 
-char* ffindex_get_filedata(char* data, size_t offset);
+char* ffindex_get_data_by_offset(char* data, size_t offset);
 
-char* ffindex_get(char *data, ffindex_index_t *index, char *filename);
+char* ffindex_get_data_by_name(char *data, ffindex_index_t *index, char *name);
+
+char* ffindex_get_data_by_index(char *data, ffindex_index_t *index, size_t entry_index);
+
+ffindex_entry_t* ffindex_get_entry_by_index(ffindex_index_t *index, size_t entry_index);
 
 ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries);
 
