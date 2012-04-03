@@ -206,7 +206,7 @@ int main(int argn, char **argv)
     ffindex_index_t* index = ffindex_index_parse(index_file, 0);
     if(index == NULL)
     {
-      perror("ffindex_index_parse failed");
+      fferror_print(__FILE__, __LINE__, __func__, index_filename);
       exit(EXIT_FAILURE);
     }
     fclose(index_file);

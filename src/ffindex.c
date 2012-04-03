@@ -193,7 +193,10 @@ char* ffindex_mmap_data(FILE *file, size_t* size)
   *size = sb.st_size;
   int fd =  fileno(file);
   if(fd < 0)
+  {
+    fferror_print(__FILE__, __LINE__, __func__, "mmap failed");
     return MAP_FAILED;
+  }
   return (char*)mmap(NULL, *size, PROT_READ, MAP_PRIVATE, fd, 0);
 }
 
@@ -229,7 +232,11 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 
   index->file = index_file;
   index->index_data = ffindex_mmap_data(index_file, &(index->index_data_size));
-  index->type = SORTED_ARRAY; /* Assume a sorted file for now */
+  if(index->index_data_size == 0)
+    warn("No entries in index file!");
+  if(index->index_data == MAP_FAILED)
+    return NULL;
+  index->type = SORTED_ARRAY; /* XXX Assume a sorted file for now */
   int i = 0;
   char* d = index->index_data;
   char* end;
@@ -249,7 +256,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   index->n_entries = i;
 
   if(index->n_entries == 0)
-    return NULL;
+    warn("index with 0 entries");
 
   return index;
 }
