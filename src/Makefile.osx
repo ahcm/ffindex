@@ -4,7 +4,7 @@ CFLAGS+=-std=c99 -O3 -g -fPIC -Wall -fnested-functions
 #LDFLAGS+=-Wl,-z,defs
 #-Wl,--version-script=libffindex.map
 
-all: ext/fmemopen.o libffindex.a ffindex_get ffindex_build ffindex_modify
+all: ext/fmemopen.o libffindex.a ffindex_get ffindex_build ffindex_modify ffindex_from_fasta
 
 ext/fmemopen.o: ext/fmemopen.c
 	cd ext && make
