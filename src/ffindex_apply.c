@@ -29,7 +29,6 @@
 #include "ffutil.h"
 
 
-
 int main(int argn, char **argv)
 {
   if(argn < 4)
@@ -60,9 +59,21 @@ int main(int argn, char **argv)
     exit(EXIT_FAILURE);
   }
   
+  // Ignore SIGPIPE
+  struct sigaction handler;
+  handler.sa_handler = SIG_IGN;
+  sigemptyset(&handler.sa_mask);
+  handler.sa_flags = 0;
+  sigaction(SIGPIPE, &handler, NULL);
+
+  size_t range_start = 0;
+  size_t range_end = index->n_entries;
+
   // Foreach entry
-  for(size_t entry_index = 0; entry_index < index->n_entries; entry_index++)
+//#pragma omp parallel for
+  for(size_t entry_index = range_start; entry_index < range_end; entry_index++)
   {
+    //fprintf(stderr, "index %ld\n", entry_index);
     int ret = 0;
     ffindex_entry_t* entry = ffindex_get_entry_by_index(index, entry_index);
     if(entry == NULL) { perror(entry->name); continue; }
@@ -81,6 +92,7 @@ int main(int argn, char **argv)
       // Make pipe from parent our new stdin
       int newfd = dup2(pipefd[0], fileno(stdin));
       if(newfd < 0) { fprintf(stdout, "%d %d\n", pipefd[0], newfd); perror(entry->name); }
+      close(pipefd[0]);
 
       // exec program with the pipe as stdin
       execvp(program_name, program_argv);
@@ -91,10 +103,18 @@ int main(int argn, char **argv)
       // Read end is for child only
       close(pipefd[0]);
 
+      // Write file data to child's stdin.
       char *filedata = ffindex_get_data_by_entry(data, entry);
       ssize_t written = 0;
       while(written < entry->length)
-        written += write(pipefd[1], filedata + written, entry->length - written);
+      {
+        int w = write(pipefd[1], filedata + written, entry->length - written);
+        if(w < 0 && errno != EPIPE)   { perror(entry->name); break; }
+        else if(w == 0 && errno != 0) { perror(entry->name); break; }
+        else
+          written += w;
+      }
+
       close(pipefd[1]); // child gets EOF
       waitpid(child_pid, NULL, 0);
     }
