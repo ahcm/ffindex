@@ -168,7 +168,7 @@ int main(int argn, char **argv)
       for(size_t entry_i = 0; entry_i < index_to_add->n_entries; entry_i++)
       {
         ffindex_entry_t *entry = &index_to_add->entries[entry_i];
-        FILE *file = ffindex_fopen(data_to_add, index_to_add, entry->name);
+        FILE *file = ffindex_fopen_by_entry(data_to_add, entry);
         ffindex_insert_filestream(data_file, index_file, &offset, file, entry->name);
         fclose(file);
       }
