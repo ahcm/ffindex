@@ -275,6 +275,12 @@ char* ffindex_get_data_by_offset(char* data, size_t offset)
 }
 
 
+char* ffindex_get_data_by_entry(char *data, ffindex_entry_t* entry)
+{
+  return ffindex_get_data_by_offset(data, entry->offset);
+}
+
+
 char* ffindex_get_data_by_name(char *data, ffindex_index_t *index, char *name)
 {
   ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, name);
@@ -282,7 +288,7 @@ char* ffindex_get_data_by_name(char *data, ffindex_index_t *index, char *name)
   if(entry == NULL)
     return NULL;
 
-  return ffindex_get_data_by_offset(data, entry->offset);
+  return ffindex_get_data_by_entry(data, entry);
 }
 
 
@@ -293,19 +299,25 @@ char* ffindex_get_data_by_index(char *data, ffindex_index_t *index, size_t entry
   if(entry == NULL)
     return NULL;
 
-  return ffindex_get_data_by_offset(data, entry->offset);
+  return ffindex_get_data_by_entry(data, entry);
 }
 
 
-FILE* ffindex_fopen(char *data, ffindex_index_t *index, char *filename)
+FILE* ffindex_fopen_by_entry(char *data, ffindex_entry_t* entry)
+{
+  char *filedata = ffindex_get_data_by_offset(data, entry->offset);
+  return fmemopen(filedata, entry->length, "r");
+}
+
+
+FILE* ffindex_fopen_by_name(char *data, ffindex_index_t *index, char *filename)
 {
   ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, filename);
 
   if(entry == NULL)
     return NULL;
 
-  char *filedata = ffindex_get_data_by_offset(data, entry->offset);
-  return fmemopen(filedata, entry->length, "r");
+  return ffindex_fopen_by_entry(data, entry);
 }
 
 
