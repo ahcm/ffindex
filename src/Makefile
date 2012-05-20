@@ -11,9 +11,12 @@ endif
 
 #-Wl,--version-script=libffindex.map
 
-all: ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so
+all: ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so
 
 ffindex.o: ffindex.c ffindex.h ffutil.h
+
+ffindex_apply: $(FFINDEX_OBJECTS) ffindex_apply.o ffindex.h
+	$(CC) -o $@ ffindex_apply.o $(LDFLAGS) -L. -lffindex
 
 ffindex_from_fasta: $(FFINDEX_OBJECTS) ffindex_from_fasta.o ffindex.h
 	$(CC) -o $@ ffindex_from_fasta.o $(LDFLAGS) -L. -lffindex
