@@ -1,7 +1,10 @@
 INSTALL_DIR?=..
 libdir=`([ -d /usr/lib64 ] && echo lib64) || echo lib`
 LANG=C
-CFLAGS+=-std=c99 -O2 -openmp -g -fPIC -Wall
+CC=gcc -fopenmp
+#CC=icc -openmp
+CFLAGS+=-std=c99 -O2 -g -fPIC -Wall -pedantic
+LDFLAGS=-lffindex -L.
 ifdef FFINDEX_STATIC
 	LDFLAGS+=-static
 	FFINDEX_OBJECTS=libffindex.a
@@ -11,12 +14,17 @@ endif
 
 #-Wl,--version-script=libffindex.map
 
-all: ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so
+all: ffindex_apply_mpi ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so
 
 ffindex.o: ffindex.c ffindex.h ffutil.h
 
 ffindex_apply: $(FFINDEX_OBJECTS) ffindex_apply.o ffindex.h
-	$(CC) -o $@ ffindex_apply.o $(LDFLAGS) -L. -lffindex
+
+ffindex_apply_mpi: $(FFINDEX_OBJECTS) ffindex_apply_mpi.o ffindex.h
+	mpicc $(CFLAGS) -I $(MPI_INCLUDE) -o $@  ffindex_apply_mpi.o $(LDFLAGS)
+
+ffindex_apply_mpi.o: ffindex_apply_mpi.c ffindex.h
+	mpicc $(CFLAGS) -I $(MPI_INCLUDE) -c ffindex_apply_mpi.c -o $@ 
 
 ffindex_from_fasta: $(FFINDEX_OBJECTS) ffindex_from_fasta.o ffindex.h
 	$(CC) -o $@ ffindex_from_fasta.o $(LDFLAGS) -L. -lffindex
@@ -60,7 +68,7 @@ time:
 
 clean:
 	rm -f ffindex.o ffutil.o ffindex_build ffindex_build.o ffindex_get ffindex_get.o libffindex.so libffindex.so.0.1 ffindex_modify ffindex_modify.o \
-		libffindex.a  ffindex_from_fasta.o ffindex_from_fasta
+		libffindex.a  ffindex_from_fasta.o ffindex_from_fasta ffindex_apply_mpi.o ffindex_apply.o
 
 install:
 	mkdir -p $(INSTALL_DIR)/bin
