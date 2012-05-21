@@ -133,8 +133,7 @@ int main(int argn, char **argv)
   batch_size = index->n_entries / mpi_num_procs;
   range_start = mpi_rank * batch_size;
   range_end = (mpi_rank + 1) * batch_size;
-  fprintf(stderr, "%d of %d handling %ld to %ld of %ld with step %ld\n", mpi_rank, mpi_num_procs, range_start, range_end, index->n_entries, batch_size);
-  fprintf(stderr, "%ld left\n", index->n_entries - (batch_size * mpi_num_procs));
+  //fprintf(stderr, "%d of %d handling %ld to %ld of %ld with step %ld\n", mpi_rank, mpi_num_procs, range_start, range_end, index->n_entries, batch_size);
 
 
   // Foreach entry
@@ -145,6 +144,12 @@ int main(int argn, char **argv)
     int error = ffindex_apply_by_entry_index(data, index, entry_index, program_name, program_argv);
     if(error != 0)
       break;
+  }
+  size_t left_over = index->n_entries - (batch_size * mpi_num_procs);
+  if(mpi_rank < left_over)
+  {
+    //fprintf(stderr, "handling left over: %ld\n", (batch_size * mpi_num_procs) + mpi_rank);
+    ffindex_apply_by_entry_index(data, index, (batch_size * mpi_num_procs) + mpi_rank, program_name, program_argv);
   }
 
   MPI_Finalize();
