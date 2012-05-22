@@ -14,7 +14,11 @@ endif
 
 #-Wl,--version-script=libffindex.map
 
+ifdef HAVE_MPI
 all: ffindex_apply_mpi ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so
+else
+all: ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so
+endif
 
 ffindex.o: ffindex.c ffindex.h ffutil.h
 
@@ -78,11 +82,15 @@ install:
 	install ffindex_build $(INSTALL_DIR)/bin/ffindex_build
 	install ffindex_modify $(INSTALL_DIR)/bin/ffindex_modify
 	install ffindex_from_fasta $(INSTALL_DIR)/bin/ffindex_from_fasta
+	install ffindex_apply $(INSTALL_DIR)/bin/ffindex_apply
 	install libffindex.so.0.1 $(INSTALL_DIR)/$(libdir)/libffindex.so.0.1
 	install libffindex.a $(INSTALL_DIR)/$(libdir)/libffindex.a
 	ln -sf libffindex.so.0.1 $(INSTALL_DIR)/$(libdir)/libffindex.so
 	install ffindex.h $(INSTALL_DIR)/include/ffindex.h
 	install ffutil.h $(INSTALL_DIR)/include/ffutil.h
+ifdef HAVE_MPI
+	install ffindex_apply_mpi $(INSTALL_DIR)/bin/ffindex_apply_mpi
+endif
 
 deinstall:
 	rm -f $(INSTALL_DIR)/bin/ffindex_get $(INSTALL_DIR)/bin/ffindex_build $(INSTALL_DIR)/bin/ffindex_modify \
