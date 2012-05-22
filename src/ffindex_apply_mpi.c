@@ -30,12 +30,10 @@
 #include "ffindex.h"
 #include "ffutil.h"
 
-int ffindex_apply_by_entry_index(char *data, ffindex_index_t* index, size_t entry_index, char* program_name, char** program_argv)
+int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* entry, char* program_name, char** program_argv)
 {
   //fprintf(stderr, "index %ld\n", entry_index);
   int ret = 0;
-  ffindex_entry_t* entry = ffindex_get_entry_by_index(index, entry_index);
-  if(entry == NULL) { perror(entry->name); return errno; }
 
   int pipefd[2];
   ret = pipe(pipefd);
@@ -137,19 +135,22 @@ int main(int argn, char **argv)
 
 
   // Foreach entry
-// XXX openmp does not like fork?
-//#pragma omp parallel for
   for(size_t entry_index = range_start; entry_index < range_end; entry_index++)
   {
-    int error = ffindex_apply_by_entry_index(data, index, entry_index, program_name, program_argv);
+    ffindex_entry_t* entry = ffindex_get_entry_by_index(index, entry_index);
+    if(entry == NULL) { perror(entry->name); return errno; }
+    int error = ffindex_apply_by_entry(data, index, entry, program_name, program_argv);
     if(error != 0)
       break;
   }
   size_t left_over = index->n_entries - (batch_size * mpi_num_procs);
   if(mpi_rank < left_over)
   {
-    //fprintf(stderr, "handling left over: %ld\n", (batch_size * mpi_num_procs) + mpi_rank);
-    ffindex_apply_by_entry_index(data, index, (batch_size * mpi_num_procs) + mpi_rank, program_name, program_argv);
+    size_t left_over_entry_index = (batch_size * mpi_num_procs) + mpi_rank;
+    ffindex_entry_t* entry = ffindex_get_entry_by_index(index, left_over_entry_index);
+    if(entry == NULL) { perror(entry->name); return errno; }
+    //fprintf(stderr, "handling left over: %ld\n", left_over_entry_index);
+    ffindex_apply_by_entry(data, index, entry, program_name, program_argv);
   }
 
   MPI_Finalize();
