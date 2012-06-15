@@ -73,7 +73,7 @@ EXCEPTION_ffindex_insert_memory:
 }
 
 
-/* Insert all file from directory into ffindex */
+/* Insert all file from a list into ffindex */
 int ffindex_insert_list_file(FILE *data_file, FILE *index_file, size_t *start_offset, FILE *list_file)
 {
   size_t offset = *start_offset;
