@@ -54,7 +54,7 @@ int main(int argn, char **argv)
   {
     char *filename = argv[i];
     char *filedata = ffindex_get_data_by_name(data, index, filename);
-    if(data == NULL)
+    if(filedata == NULL)
     {
       errno = ENOENT; 
       fferror_print(__FILE__, __LINE__, "ffindex_get key not found in index", filename);
