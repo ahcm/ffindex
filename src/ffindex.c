@@ -223,12 +223,12 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
     num_max_entries = FFINDEX_MAX_INDEX_ENTRIES_DEFAULT;
   size_t nbytes = sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * num_max_entries);
   ffindex_index_t *index = (ffindex_index_t *)malloc(nbytes);
-  index->num_max_entries = num_max_entries;
   if(index == NULL)
   {
     fferror_print(__FILE__, __LINE__, __func__, "malloc failed");
     return NULL;
   }
+  index->num_max_entries = num_max_entries;
 
   index->file = index_file;
   index->index_data = ffindex_mmap_data(index_file, &(index->index_data_size));
