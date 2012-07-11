@@ -54,7 +54,8 @@ int ffindex_insert_memory(FILE *data_file, FILE *index_file, size_t *offset, cha
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
     char buffer[1] = {'\0'};
-    fwrite(buffer, sizeof(char), 1, data_file);
+    if(fwrite(buffer, sizeof(char), 1, data_file) != 1)
+      perror("ffindex_insert_memory");
     *offset += 1;
     if(ferror(data_file) != 0)
       goto EXCEPTION_ffindex_insert_memory;
@@ -159,7 +160,8 @@ int ffindex_insert_filestream(FILE *data_file, FILE *index_file, size_t *offset,
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
     buffer[0] = '\0';
-    fwrite(buffer, sizeof(char), 1, data_file);
+    if(fwrite(buffer, sizeof(char), 1, data_file) != 1)
+      perror("ffindex_insert_filestream");
     *offset += 1;
     if(ferror(data_file) != 0)
       goto EXCEPTION_ffindex_insert_file;
