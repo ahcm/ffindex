@@ -15,6 +15,10 @@
  * files.
  */
 
+#ifndef _FFINDEX_H
+
+#define _FFINDEX_H 1
+
 #include <stdio.h>
 
 #define FFINDEX_VERSION 0.961
@@ -86,3 +90,5 @@ int ffindex_tree_write(ffindex_index_t* index, FILE* index_file);
 int ffindex_insert_filestream(FILE *data_file, FILE *index_file, size_t *offset, FILE* file, char *name);
 
 char* ffindex_copyright();
+
+#endif
