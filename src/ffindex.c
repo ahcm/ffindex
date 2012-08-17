@@ -265,7 +265,10 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 
 ffindex_entry_t* ffindex_get_entry_by_index(ffindex_index_t *index, size_t entry_index)
 {
-  return &index->entries[entry_index];
+  if(entry_index < index->n_entries)
+    return &index->entries[entry_index];
+  else
+    return NULL;
 }
 
 /* Using a function for this looks like overhead. But a more advanced data format,

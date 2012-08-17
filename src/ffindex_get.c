@@ -79,7 +79,7 @@ int main(int argn, char **argv)
       if(filedata == NULL)
       {
         errno = ENOENT; 
-        fferror_print(__FILE__, __LINE__, "ffindex_get key not found in index", argv[i]);
+        fferror_print(__FILE__, __LINE__, "ffindex_get entry index out of range", argv[i]);
       }
       else
         fputs(filedata, stdout);
