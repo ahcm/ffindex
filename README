@@ -56,3 +56,18 @@ $ ffindex_modify -u /tmp/test.ffindex b
 Retrieve three entries, "b" should now be missing:
 $ ffindex_get /tmp/test.data /tmp/test.ffindex a b foo
 
+Convert a Fasta file to ffindex, entry names are incerental IDs starting from 1:
+$ ffindex_from_fasta -s fasta.ffdata fasta.ffindex NC_007779.ffn
+
+Get first entry by name:
+$ ffindex_get fasta.ffdata fasta.ffindex 1
+
+Get first and third entry by entry index, this a little faster:
+$ ffindex_get fasta.ffdata fasta.ffindex -n 1 3
+
+Count the characters including header in each entry:
+$ ffindex_apply fasta.ffdata fasta.ffindex wc -c
+
+Count the number of characters in each sequence, without the header:
+$ ffindex_apply fasta.ffdata fasta.ffindex perl -ne '$x += length unless(/^>/); END{print "$x\n"}'
+
