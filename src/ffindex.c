@@ -54,7 +54,8 @@ int ffindex_insert_memory(FILE *data_file, FILE *index_file, size_t *offset, cha
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
     char buffer[1] = {'\0'};
-    fwrite(buffer, sizeof(char), 1, data_file);
+    if(fwrite(buffer, sizeof(char), 1, data_file) != 1)
+      perror("ffindex_insert_memory");
     *offset += 1;
     if(ferror(data_file) != 0)
       goto EXCEPTION_ffindex_insert_memory;
@@ -159,7 +160,8 @@ int ffindex_insert_filestream(FILE *data_file, FILE *index_file, size_t *offset,
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
     buffer[0] = '\0';
-    fwrite(buffer, sizeof(char), 1, data_file);
+    if(fwrite(buffer, sizeof(char), 1, data_file) != 1)
+      perror("ffindex_insert_filestream");
     *offset += 1;
     if(ferror(data_file) != 0)
       goto EXCEPTION_ffindex_insert_file;
@@ -223,12 +225,12 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
     num_max_entries = FFINDEX_MAX_INDEX_ENTRIES_DEFAULT;
   size_t nbytes = sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * num_max_entries);
   ffindex_index_t *index = (ffindex_index_t *)malloc(nbytes);
-  index->num_max_entries = num_max_entries;
   if(index == NULL)
   {
     fferror_print(__FILE__, __LINE__, __func__, "malloc failed");
     return NULL;
   }
+  index->num_max_entries = num_max_entries;
 
   index->file = index_file;
   index->index_data = ffindex_mmap_data(index_file, &(index->index_data_size));
@@ -263,7 +265,10 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 
 ffindex_entry_t* ffindex_get_entry_by_index(ffindex_index_t *index, size_t entry_index)
 {
-  return &index->entries[entry_index];
+  if(entry_index < index->n_entries)
+    return &index->entries[entry_index];
+  else
+    return NULL;
 }
 
 /* Using a function for this looks like overhead. But a more advanced data format,

@@ -17,22 +17,42 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 #include "ffindex.h"
 #include "ffutil.h"
 
+void usage(char* program_name)
+{
+    fprintf(stderr, "USAGE: %s data_filename index_filename entry name(s)\n"
+                    "-n\tuse index of entry instead of entry name\n"
+                    "\nDesigned and implemented by Andy Hauser <hauser@genzentrum.lmu.de>.\n",
+                    program_name);
+}
 
 int main(int argn, char **argv)
 {
+  int by_index = 0;
+  int opt;
+  while ((opt = getopt(argn, argv, "n")) != -1)
+  {
+    switch (opt)
+    {
+      case 'n':
+        by_index = 1;
+        break;
+      default:
+        usage(argv[0]);
+        return EXIT_FAILURE;
+    }
+  }
   if(argn < 3)
   {
-    fprintf(stderr, "USAGE: %s data_filename index_filename filename(s)\n"
-                    "\nDesigned and implemented by Andy Hauser <hauser@genzentrum.lmu.de>.\n",
-                    argv[0]);
-    return -1;
+    usage(argv[0]);
+    return EXIT_FAILURE;
   }
-  char *data_filename  = argv[1];
-  char *index_filename = argv[2];
+  char *data_filename  = argv[optind++];
+  char *index_filename = argv[optind++];
 
   FILE *data_file  = fopen(data_filename,  "r");
   FILE *index_file = fopen(index_filename, "r");
@@ -50,33 +70,51 @@ int main(int argn, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  for(int i = 3; i < argn; i++)
+  if(by_index)
   {
-    char *filename = argv[i];
-    char *filedata = ffindex_get_data_by_name(data, index, filename);
-    if(filedata == NULL)
+    for(int i = optind; i < argn; i++)
     {
-      errno = ENOENT; 
-      fferror_print(__FILE__, __LINE__, "ffindex_get key not found in index", filename);
+      size_t index_n = atol(argv[i]) - 1; // offset from 0 but specify from 1
+      char *filedata = ffindex_get_data_by_index(data, index, index_n);
+      if(filedata == NULL)
+      {
+        errno = ENOENT; 
+        fferror_print(__FILE__, __LINE__, "ffindex_get entry index out of range", argv[i]);
+      }
+      else
+        fputs(filedata, stdout);
     }
-    else
-      fputs(filedata, stdout);
+  }
+  else // by name
+  {
+    for(int i = optind; i < argn; i++)
+    {
+      char *filename = argv[i];
+      char *filedata = ffindex_get_data_by_name(data, index, filename);
+      if(filedata == NULL)
+      {
+        errno = ENOENT; 
+        fferror_print(__FILE__, __LINE__, "ffindex_get key not found in index", filename);
+      }
+      else
+        fputs(filedata, stdout);
 
-    /* Alternative code using (slower) ffindex_fopen */
-    /*
-    FILE *file = ffindex_fopen(data, index, filename);
-    if(file == NULL)
-    {
-      errno = ENOENT; 
-      fferror_print(__FILE__, __LINE__, "ffindex_fopen file not found in index", filename);
+      /* Alternative code using (slower) ffindex_fopen */
+      /*
+         FILE *file = ffindex_fopen(data, index, filename);
+         if(file == NULL)
+         {
+         errno = ENOENT; 
+         fferror_print(__FILE__, __LINE__, "ffindex_fopen file not found in index", filename);
+         }
+         else
+         {
+         char line[LINE_MAX];
+         while(fgets(line, LINE_MAX, file) != NULL)
+         printf("%s", line);
+         }
+         */
     }
-    else
-    {
-      char line[LINE_MAX];
-      while(fgets(line, LINE_MAX, file) != NULL)
-        printf("%s", line);
-    }
-    */
   }
 
   return 0;

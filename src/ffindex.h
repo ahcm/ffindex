@@ -15,9 +15,13 @@
  * files.
  */
 
+#ifndef _FFINDEX_H
+
+#define _FFINDEX_H 1
+
 #include <stdio.h>
 
-#define FFINDEX_VERSION 0.94
+#define FFINDEX_VERSION 0.961
 #define FFINDEX_MAX_INDEX_ENTRIES_DEFAULT 40000000
 #define FFINDEX_MAX_ENTRY_NAME_LENTH 56
 
@@ -86,3 +90,5 @@ int ffindex_tree_write(ffindex_index_t* index, FILE* index_file);
 int ffindex_insert_filestream(FILE *data_file, FILE *index_file, size_t *offset, FILE* file, char *name);
 
 char* ffindex_copyright();
+
+#endif
