@@ -85,6 +85,7 @@ install:
 	install ffindex_modify $(INSTALL_DIR)/bin/ffindex_modify
 	install ffindex_from_fasta $(INSTALL_DIR)/bin/ffindex_from_fasta
 	install ffindex_apply $(INSTALL_DIR)/bin/ffindex_apply
+	install ffindex_unpack $(INSTALL_DIR)/bin/ffindex_unpack
 	install libffindex.so.0.1 $(INSTALL_DIR)/$(libdir)/libffindex.so.0.1
 	install libffindex.a $(INSTALL_DIR)/$(libdir)/libffindex.a
 	ln -sf libffindex.so.0.1 $(INSTALL_DIR)/$(libdir)/libffindex.so
