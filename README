@@ -9,6 +9,11 @@ which basically captures the spirit of the Gnu Public License (GPL).
 See:
 http://creativecommons.org/licenses/by-sa/3.0/
 
+* Thanks
+
+Thanks to Laszlo Kajan for creating and maintaining Debian packages
+and many suggestions to improve the build and user experience.
+
 
 * Overview
 
