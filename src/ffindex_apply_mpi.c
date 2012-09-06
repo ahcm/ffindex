@@ -85,28 +85,58 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
 
 int main(int argn, char **argv)
 {
-  int mpi_error, mpi_rank, mpi_num_procs;
+  int mpi_error,
+      mpi_rank,
+      mpi_num_procs;
+
   mpi_error = MPI_Init(&argn, &argv);
   mpi_error = MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
   mpi_error = MPI_Comm_size(MPI_COMM_WORLD, &mpi_num_procs);
 
-  if(argn < 4)
+  int opt;
+  char *out_data_filename = NULL,
+       *out_index_filename = NULL;
+
+  while ((opt = getopt(argn, argv, "d:i:")) != -1)
+  {
+    switch (opt)
+    {
+      case 'd':
+        out_data_filename = optarg;
+        break;
+      case 'i':
+        out_index_filename = optarg;
+        break;
+    }
+  }
+
+  if(optind - argn < 4)
   {
     fprintf(stderr, "USAGE: %s DATA_FILENAME INDEX_FILENAME PROGRAM [PROGRAM_ARGS]*\n"
                     "\nDesigned and implemented by Andy Hauser <hauser@genzentrum.lmu.de>.\n",
                     argv[0]);
     return -1;
   }
-  char *data_filename  = argv[1];
-  char *index_filename = argv[2];
-  char *program_name   = argv[3];
-  char **program_argv = argv + 3;
+  char *data_filename  = argv[optind + 1];
+  char *index_filename = argv[optind + 2];
+  char *program_name   = argv[optind + 3];
+  char **program_argv = argv + optind + 3;
 
   FILE *data_file  = fopen(data_filename,  "r");
   FILE *index_file = fopen(index_filename, "r");
 
   if( data_file == NULL) { fferror_print(__FILE__, __LINE__, argv[0], data_filename);  exit(EXIT_FAILURE); }
   if(index_file == NULL) { fferror_print(__FILE__, __LINE__, argv[0], index_filename);  exit(EXIT_FAILURE); }
+
+  FILE *out_data_file = NULL, *out_index_file = NULL;
+  if(out_data_filename != NULL && out_index_filename != NULL)
+  {
+    out_data_file  = fopen(out_data_filename,  "w+");
+    out_index_file = fopen(out_index_filename, "w+");
+
+    if( out_data_file == NULL) { fferror_print(__FILE__, __LINE__, argv[0], out_data_filename);  exit(EXIT_FAILURE); }
+    if(out_index_file == NULL) { fferror_print(__FILE__, __LINE__, argv[0], out_index_filename);  exit(EXIT_FAILURE); }
+  }
 
   size_t data_size;
   char *data = ffindex_mmap_data(data_file, &data_size);

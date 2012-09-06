@@ -14,11 +14,13 @@ endif
 
 #-Wl,--version-script=libffindex.map
 
+OBJECTS=ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so ffindex_unpack
+
 ifdef HAVE_MPI
-all: ffindex_apply_mpi ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so
-else
-all: ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so
+OBJECTS+=ffindex_apply_mpi
 endif
+
+all: $(OBJECTS)
 
 ffindex.o: ffindex.c ffindex.h ffutil.h
 
