@@ -31,14 +31,22 @@
 
 void usage(char *program_name)
 {
-    fprintf(stderr, "USAGE: %s [-a|-v] [-s] [-f file]* data_filename index_filename [dir_to_index|file]*\n"
-                    "\t-a\tappend\n"
-                    "\t-d a second ffindex data file for inserting/appending\n"
-                    "\t-i a second ffindex index file for insterting/appending\n"
-                    "\t-f file\tfile each line containing a filename to index\n"
-                    "\t\t-f can be specified up to %d times\n"
-                    "\t-s\tsort index file\n"
-                    "\t-v\tprint version and other info then exit\n"
+    fprintf(stderr, "USAGE: %s [-a|-v] [-s] [-f file]* OUT_DATA_FILE OUT_INDEX_FILE [-d 2ND_FFDATA_FILE -i 2ND_FFINDEX_FILE] [DIR_TO_INDEX|FILE]*\n"
+                    "\t-a\t\tappend files/indexes, also needed for sorting an already existing ffindex\n"
+                    "\t-d FFDATA_FILE\ta second ffindex data file for inserting/appending\n"
+                    "\t-i FFINDEX_FILE\ta second ffindex index file for insterting/appending\n"
+                    "\t-f FILE\t\tfile containing a list of file names, one per line\n"
+                    "\t\t\t-f can be specified up to %d times\n"
+                    "\t-s\t\tsort index file, so that the index can queried. Addings can be done without.\n"
+                    "\t-v\t\tprint version and other info then exit\n"
+                    "\nEXAMPLES:\n"
+                    "\tCreate a new ffindex containing all files from the bar directory: myfile1.txt, myfile2.txt"
+                    "\tand sort (-s) it so that e.g. ffindex_get can use it\n"
+                    "\t\t$ ffindex_build -s foo.ffdata foo.ffindex bar\n"
+                    "\n\tAdd (-a) more files: myfile3.txt, myfile4.txt\n"
+                    "\t\t$ ffindex_build -a foo.ffdata foo.ffindex myfile3.txt myfile4.txt\n"
+                    "\n\tOops, forgot to sort it (-s) so do it afterwards:\n"
+                    "\t\t$ ffindex_build -as foo.ffdata foo.ffindex\n"
                     "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n", program_name, MAX_FILENAME_LIST_FILES);
 }
 
