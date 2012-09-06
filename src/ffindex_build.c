@@ -48,7 +48,11 @@ void usage(char *program_name)
                     "\t\t$ ffindex_build -a foo.ffdata foo.ffindex myfile3.txt myfile4.txt\n"
                     "\n\tOops, forgot to sort it (-s) so do it afterwards:\n"
                     "\t\t$ ffindex_build -as foo.ffdata foo.ffindex\n"
-                    "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n", program_name, MAX_FILENAME_LIST_FILES);
+                    "\nNOTE:\n"
+                    "\tMaximum key/filename length is %d and maximum entries are by default %d\n"
+                    "\tThis can be changed in the sources.\n"
+                    "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n",
+                    program_name, MAX_FILENAME_LIST_FILES, FFINDEX_MAX_ENTRY_NAME_LENTH, FFINDEX_MAX_INDEX_ENTRIES_DEFAULT);
 }
 
 int main(int argn, char **argv)
