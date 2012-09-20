@@ -157,6 +157,8 @@ int ffindex_insert_filestream(FILE *data_file, FILE *index_file, size_t *offset,
       if(read_size != write_size)
         fferror_print(__FILE__, __LINE__, __func__, name);
     }
+    if(ferror(file))
+      warn("fread");
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
     buffer[0] = '\0';

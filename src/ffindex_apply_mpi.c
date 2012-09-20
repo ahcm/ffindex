@@ -23,6 +23,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
+#include <fcntl.h>
+
 
 #include <mpi.h>
 
@@ -51,8 +54,8 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
   pid_t child_pid = fork();
   if(child_pid == 0)
   {
-    //fclose(data_file);
-    //fclose(index_file);
+    fclose(data_file_out);
+    fclose(index_file_out);
     close(pipefd_stdin[1]);
     if(capture_stdout)
       close(pipefd_stdout[0]);
@@ -66,7 +69,7 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
     {
       int newfd_out = dup2(pipefd_stdout[1], fileno(stdout));
       if(newfd_out < 0) { fprintf(stderr, "ERROR in dup2 out %d %d\n", pipefd_stdout[1], newfd_out); perror(entry->name); }
-      close(pipefd_stdout[1]);
+      //close(pipefd_stdout[1]);
     }
 
     // exec program with the pipe as stdin
@@ -77,30 +80,57 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
   {
     // Read end is for child only
     close(pipefd_stdin[0]);
-    if(data_file_out != NULL)
+    if(capture_stdout)
       close(pipefd_stdout[1]);
 
-    // Write file data to child's stdin.
     char *filedata = ffindex_get_data_by_entry(data, entry);
+
+    int flags = fcntl(pipefd_stdout[0], F_GETFL, 0);
+    fcntl(pipefd_stdout[0], F_SETFL, flags | O_NONBLOCK);
+
+    // Write file data to child's stdin.
     ssize_t written = 0;
-    while(written < entry->length - 1) // Don't write ffindex trailing '\0'
+    size_t to_write = entry->length - 1; // Don't write ffindex trailing '\0'
+    //fprintf(stderr, "to write %ld\n", to_write);
+    char* read_buffer = malloc(400 * 1024 * 1024);
+    char* b = read_buffer;
+    while(written < to_write)
     {
-      ssize_t w = write(pipefd_stdin[1], filedata + written, entry->length - written - 1);
-      if(w < 0 && errno != EPIPE)   { fprintf(stderr, "ERROR in child!\n"); perror(entry->name); break; }
-      else if(w == 0 && errno != 0) { fprintf(stderr, "ERROR in child!\n"); perror(entry->name); break; }
+      size_t rest = to_write - written;
+      int batch_size = PIPE_BUF;
+      if(rest < PIPE_BUF)
+        batch_size = rest;
+
+      ssize_t w = write(pipefd_stdin[1], filedata + written, batch_size);
+      if(w < 0 && errno != EPIPE)
+        { fprintf(stderr, "ERROR in child!\n"); perror(entry->name); break; }
       else
         written += w;
+
+      //fprintf(stderr, "w+ %ld already %ld of %ld\n", w, written,  entry->length - 1);
+
+      // To avoid blocking try to read some data
+      ssize_t r = read(pipefd_stdout[0], b, PIPE_BUF);
+      //fprintf(stderr, "r- %ld\n", r);
+      if(r > 0)
+        b += r;
     }
     close(pipefd_stdin[1]); // child gets EOF
 
-    if(capture_stdout)
-    {
-      printf("insert %s\n", entry->name);
-      FILE* child_stdout = fdopen(pipefd_stdout[0], "r");
-      ffindex_insert_filestream(data_file_out, index_file_out, offset, child_stdout, entry->name);
-      close(pipefd_stdout[0]);
-    }
+    // Read rest
+    fcntl(pipefd_stdout[0], F_SETFL, flags);
+    ssize_t r;
+    while((r = read(pipefd_stdout[0], b, PIPE_BUF)) > 0)
+      ;
+    close(pipefd_stdout[0]);
+    ffindex_insert_memory(data_file_out, index_file_out, offset, read_buffer, b - read_buffer, entry->name);
+
+    //fprintf(stderr, "--inserted %s\n", entry->name);
+
+    //puts("waiting");
     waitpid(child_pid, NULL, 0);
+    //puts("waiting done");
+
   }
   else
   {
@@ -206,10 +236,14 @@ int main(int argn, char **argv)
     for(size_t entry_index = range_start; entry_index < range_end; entry_index++)
     {
       ffindex_entry_t* entry = ffindex_get_entry_by_index(index, entry_index);
+      printf("entry name %s\n", entry->name);
       if(entry == NULL) { perror(entry->name); return errno; }
       int error = ffindex_apply_by_entry(data, index, entry, program_name, program_argv, data_file_out, index_file_out, &offset);
       if(error != 0)
+      {
+        perror("ERRROR");
         break;
+      }
     }
   ssize_t left_over = index->n_entries - (batch_size * mpi_num_procs);
   if(mpi_rank < left_over)
