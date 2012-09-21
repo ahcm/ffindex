@@ -53,7 +53,12 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
     if(ret != 0) { fprintf(stderr, "ERROR in pipe stdout!\n"); perror(entry->name); return errno; }
   }
 
+  // Flush so child doesn't copy and also flushes, leading to duplicate output
+  fflush(data_file_out);
+  fflush(index_file_out);
+
   pid_t child_pid = fork();
+
   if(child_pid == 0)
   {
     fclose(data_file_out);
@@ -238,14 +243,10 @@ int main(int argn, char **argv)
     for(size_t entry_index = range_start; entry_index < range_end; entry_index++)
     {
       ffindex_entry_t* entry = ffindex_get_entry_by_index(index, entry_index);
-      printf("entry name %s\n", entry->name);
       if(entry == NULL) { perror(entry->name); return errno; }
       int error = ffindex_apply_by_entry(data, index, entry, program_name, program_argv, data_file_out, index_file_out, &offset);
       if(error != 0)
         { perror(entry->name); break; }
-      puts("^^^^^^^^^^^");
-      system("cat t2.ffindex.0");
-      puts("-----------");
     }
   ssize_t left_over = index->n_entries - (batch_size * mpi_num_procs);
   if(mpi_rank < left_over)
@@ -267,7 +268,7 @@ int main(int argn, char **argv)
   MPI_Barrier(MPI_COMM_WORLD);
 
 
-  // merge FFindexes
+  // merge FFindexes in master
   if(data_filename_out != NULL && mpi_rank == 0)
   {
     char* merge_command  = malloc(FILENAME_MAX * 5);
@@ -275,7 +276,7 @@ int main(int argn, char **argv)
     {
       snprintf( merge_command, FILENAME_MAX, "ffindex_build -as %s %s -d %s.%d -i %s.%d",
                 data_filename_out, index_filename_out, data_filename_out, i, index_filename_out, i);
-      puts(merge_command);
+      //puts(merge_command);
       system(merge_command);
     }
   }
