@@ -76,7 +76,7 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
     {
       int newfd_out = dup2(pipefd_stdout[1], fileno(stdout));
       if(newfd_out < 0) { fprintf(stderr, "ERROR in dup2 out %d %d\n", pipefd_stdout[1], newfd_out); perror(entry->name); }
-      //close(pipefd_stdout[1]);
+      close(pipefd_stdout[1]);
     }
 
     // exec program with the pipe as stdin
@@ -85,20 +85,26 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
   }
   else if(child_pid > 0)
   {
+    // parent writes to and possible reads from child
+
+    int flags = 0;
+
     // Read end is for child only
     close(pipefd_stdin[0]);
+
     if(capture_stdout)
+    {
       close(pipefd_stdout[1]);
+      flags = fcntl(pipefd_stdout[0], F_GETFL, 0);
+      fcntl(pipefd_stdout[0], F_SETFL, flags | O_NONBLOCK);
+    }
 
     char *filedata = ffindex_get_data_by_entry(data, entry);
 
-    int flags = fcntl(pipefd_stdout[0], F_GETFL, 0);
-    fcntl(pipefd_stdout[0], F_SETFL, flags | O_NONBLOCK);
 
     // Write file data to child's stdin.
     ssize_t written = 0;
     size_t to_write = entry->length - 1; // Don't write ffindex trailing '\0'
-    //fprintf(stderr, "to write %ld\n", to_write);
     char* b = read_buffer;
     while(written < to_write)
     {
@@ -107,36 +113,38 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
       if(rest < PIPE_BUF)
         batch_size = rest;
 
-      ssize_t w = write(pipefd_stdin[1], filedata + written, batch_size);
-      if(w < 0 && errno != EPIPE)
+      if(capture_stdout)
+      {
+        ssize_t w = write(pipefd_stdin[1], filedata + written, batch_size);
+        if(w < 0 && errno != EPIPE)
         { fprintf(stderr, "ERROR in child!\n"); perror(entry->name); break; }
-      else
-        written += w;
+        else
+          written += w;
 
-      //fprintf(stderr, "w+ %ld already %ld of %ld\n", w, written,  entry->length - 1);
+        //fprintf(stderr, "w+ %ld already %ld of %ld\n", w, written,  entry->length - 1);
 
-      // To avoid blocking try to read some data
-      ssize_t r = read(pipefd_stdout[0], b, PIPE_BUF);
-      //fprintf(stderr, "r- %ld\n", r);
-      if(r > 0)
-        b += r;
+        // To avoid blocking try to read some data
+        ssize_t r = read(pipefd_stdout[0], b, PIPE_BUF);
+        //fprintf(stderr, "r- %ld\n", r);
+        if(r > 0)
+          b += r;
+      }
     }
     close(pipefd_stdin[1]); // child gets EOF
 
-    // Read rest
-    fcntl(pipefd_stdout[0], F_SETFL, flags); // Remove O_NONBLOCK
-    ssize_t r;
-    while((r = read(pipefd_stdout[0], b, PIPE_BUF)) > 0)
-      b += r;
-    close(pipefd_stdout[0]);
-    ffindex_insert_memory(data_file_out, index_file_out, offset, read_buffer, b - read_buffer, entry->name);
+    if(capture_stdout)
+    {
+      // Read rest
+      fcntl(pipefd_stdout[0], F_SETFL, flags); // Remove O_NONBLOCK
+      ssize_t r;
+      while((r = read(pipefd_stdout[0], b, PIPE_BUF)) > 0)
+        b += r;
+      close(pipefd_stdout[0]);
 
-    //fprintf(stderr, "--inserted %s\n", entry->name);
+      ffindex_insert_memory(data_file_out, index_file_out, offset, read_buffer, b - read_buffer, entry->name);
+    }
 
-    //puts("waiting");
     waitpid(child_pid, NULL, 0);
-    //puts("waiting done");
-
   }
   else
   {
@@ -209,6 +217,8 @@ int main(int argn, char **argv)
     if(index_file_out == NULL) { fferror_print(__FILE__, __LINE__, argv[0], index_filename_out);  exit(EXIT_FAILURE); }
   }
 
+  int capture_stdout = (data_file_out != NULL);
+
   size_t data_size;
   char *data = ffindex_mmap_data(data_file, &data_size);
 
@@ -260,7 +270,7 @@ int main(int argn, char **argv)
       perror(entry->name);
   }
 
-  if(data_file_out != NULL)
+  if(capture_stdout)
     fclose(data_file_out);
   if(index_file_out != NULL)
     fclose(index_file_out);
