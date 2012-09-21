@@ -33,6 +33,8 @@
 #include "ffindex.h"
 #include "ffutil.h"
 
+char* read_buffer;
+
 int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* entry, char* program_name, char** program_argv, FILE* data_file_out, FILE* index_file_out, size_t *offset)
 {
   //fprintf(stderr, "index %ld\n", entry_index);
@@ -92,7 +94,6 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
     ssize_t written = 0;
     size_t to_write = entry->length - 1; // Don't write ffindex trailing '\0'
     //fprintf(stderr, "to write %ld\n", to_write);
-    char* read_buffer = malloc(400 * 1024 * 1024);
     char* b = read_buffer;
     while(written < to_write)
     {
@@ -118,10 +119,10 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
     close(pipefd_stdin[1]); // child gets EOF
 
     // Read rest
-    fcntl(pipefd_stdout[0], F_SETFL, flags);
+    fcntl(pipefd_stdout[0], F_SETFL, flags); // Remove O_NONBLOCK
     ssize_t r;
     while((r = read(pipefd_stdout[0], b, PIPE_BUF)) > 0)
-      ;
+      b += r;
     close(pipefd_stdout[0]);
     ffindex_insert_memory(data_file_out, index_file_out, offset, read_buffer, b - read_buffer, entry->name);
 
@@ -176,6 +177,7 @@ int main(int argn, char **argv)
                     argv[0]);
     return -1;
   }
+  read_buffer = malloc(400 * 1024 * 1024);
   char *data_filename  = argv[optind++];
   char *index_filename = argv[optind++];
   char *program_name   = argv[optind];
@@ -240,10 +242,10 @@ int main(int argn, char **argv)
       if(entry == NULL) { perror(entry->name); return errno; }
       int error = ffindex_apply_by_entry(data, index, entry, program_name, program_argv, data_file_out, index_file_out, &offset);
       if(error != 0)
-      {
-        perror("ERRROR");
-        break;
-      }
+        { perror(entry->name); break; }
+      puts("^^^^^^^^^^^");
+      system("cat t2.ffindex.0");
+      puts("-----------");
     }
   ssize_t left_over = index->n_entries - (batch_size * mpi_num_procs);
   if(mpi_rank < left_over)
@@ -252,7 +254,9 @@ int main(int argn, char **argv)
     ffindex_entry_t* entry = ffindex_get_entry_by_index(index, left_over_entry_index);
     if(entry == NULL) { perror(entry->name); return errno; }
     //fprintf(stderr, "handling left over: %ld\n", left_over_entry_index);
-    ffindex_apply_by_entry(data, index, entry, program_name, program_argv, data_file_out, index_file_out, &offset);
+    int error = ffindex_apply_by_entry(data, index, entry, program_name, program_argv, data_file_out, index_file_out, &offset);
+    if(error != 0)
+      perror(entry->name);
   }
 
   if(data_file_out != NULL)
@@ -261,6 +265,7 @@ int main(int argn, char **argv)
     fclose(index_file_out);
 
   MPI_Barrier(MPI_COMM_WORLD);
+
 
   // merge FFindexes
   if(data_filename_out != NULL && mpi_rank == 0)

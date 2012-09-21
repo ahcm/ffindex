@@ -62,6 +62,7 @@ int ffindex_insert_memory(FILE *data_file, FILE *index_file, size_t *offset, cha
 
     /* write index entry */
     fprintf(index_file, "%s\t%zd\t%zd\n", name, offset_before, *offset - offset_before);
+    fprintf(stderr, "%s\t%zd\t%zd\n", name, offset_before, *offset - offset_before);
 
 
     return myerrno;
