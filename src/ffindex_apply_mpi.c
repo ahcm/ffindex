@@ -37,7 +37,6 @@ char* read_buffer;
 
 int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* entry, char* program_name, char** program_argv, FILE* data_file_out, FILE* index_file_out, size_t *offset)
 {
-  //fprintf(stderr, "index %ld\n", entry_index);
   int ret = 0;
   int capture_stdout = (data_file_out != NULL);
 
@@ -61,11 +60,13 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
 
   if(child_pid == 0)
   {
-    fclose(data_file_out);
-    fclose(index_file_out);
     close(pipefd_stdin[1]);
     if(capture_stdout)
+    {
+      fclose(data_file_out);
+      fclose(index_file_out);
       close(pipefd_stdout[0]);
+    }
 
     // Make pipe from parent our new stdin
     int newfd_in = dup2(pipefd_stdin[0], fileno(stdin));
@@ -93,14 +94,15 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
     close(pipefd_stdin[0]);
 
     if(capture_stdout)
-    {
       close(pipefd_stdout[1]);
-      flags = fcntl(pipefd_stdout[0], F_GETFL, 0);
-      fcntl(pipefd_stdout[0], F_SETFL, flags | O_NONBLOCK);
-    }
 
     char *filedata = ffindex_get_data_by_entry(data, entry);
 
+    if(capture_stdout)
+    {
+      flags = fcntl(pipefd_stdout[0], F_GETFL, 0);
+      fcntl(pipefd_stdout[0], F_SETFL, flags | O_NONBLOCK);
+    }
 
     // Write file data to child's stdin.
     ssize_t written = 0;
@@ -113,19 +115,16 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
       if(rest < PIPE_BUF)
         batch_size = rest;
 
+      ssize_t w = write(pipefd_stdin[1], filedata + written, batch_size);
+      if(w < 0 && errno != EPIPE)
+      { fprintf(stderr, "ERROR in child!\n"); perror(entry->name); break; }
+      else
+        written += w;
+
       if(capture_stdout)
       {
-        ssize_t w = write(pipefd_stdin[1], filedata + written, batch_size);
-        if(w < 0 && errno != EPIPE)
-        { fprintf(stderr, "ERROR in child!\n"); perror(entry->name); break; }
-        else
-          written += w;
-
-        //fprintf(stderr, "w+ %ld already %ld of %ld\n", w, written,  entry->length - 1);
-
         // To avoid blocking try to read some data
         ssize_t r = read(pipefd_stdout[0], b, PIPE_BUF);
-        //fprintf(stderr, "r- %ld\n", r);
         if(r > 0)
           b += r;
       }
