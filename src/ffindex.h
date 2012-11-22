@@ -69,6 +69,8 @@ char* ffindex_get_data_by_index(char *data, ffindex_index_t *index, size_t entry
 
 ffindex_entry_t* ffindex_get_entry_by_index(ffindex_index_t *index, size_t entry_index);
 
+ffindex_entry_t* ffindex_get_entry_by_name(ffindex_index_t *index, char *name);
+
 ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries);
 
 ffindex_entry_t* ffindex_bsearch_get_entry(ffindex_index_t *index, char *name);

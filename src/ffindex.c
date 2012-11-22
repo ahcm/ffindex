@@ -211,6 +211,10 @@ static int ffindex_compare_entries_by_name(const void *pentry1, const void *pent
   return strncmp(entry1->name, entry2->name, FFINDEX_MAX_ENTRY_NAME_LENTH);
 }
 
+ffindex_entry_t* ffindex_get_entry_by_name(ffindex_index_t *index, char *name)
+{
+  return ffindex_bsearch_get_entry(index, name);
+}
 
 ffindex_entry_t* ffindex_bsearch_get_entry(ffindex_index_t *index, char *name)
 {
