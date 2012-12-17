@@ -143,7 +143,9 @@ int ffindex_apply_by_entry(char *data, ffindex_index_t* index, ffindex_entry_t* 
       ffindex_insert_memory(data_file_out, index_file_out, offset, read_buffer, b - read_buffer, entry->name);
     }
 
-    waitpid(child_pid, NULL, 0);
+    int status;
+    waitpid(child_pid, &status, 0);
+    fprintf(stderr, "%s\t%ld\t%ld\t%d\n", entry->name, entry->offset, entry->length, WEXITSTATUS(status));
   }
   else
   {
