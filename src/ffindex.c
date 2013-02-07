@@ -220,8 +220,22 @@ EXCEPTION_ffindex_insert_file:
     }
 }
 
-/* XXX not implemented yet */
-int ffindex_restore(FILE *data_file, FILE *index_file, char *input_dir_name)
+
+int ffindex_insert_ffindex(FILE* data_file, FILE* index_file, size_t* offset, char* data_to_add, ffindex_index_t* index_to_add)
+{
+  int err = EXIT_SUCCESS;
+  for(size_t entry_i = 0; entry_i < index_to_add->n_entries; entry_i++)
+  {
+    ffindex_entry_t *entry = ffindex_get_entry_by_index(index_to_add, entry_i);
+    if(entry == NULL) { fferror_print(__FILE__, __LINE__, __func__, ""); return EXIT_FAILURE; }
+    err = ffindex_insert_memory(data_file, index_file, offset, ffindex_get_data_by_entry(data_to_add, entry), entry->length - 1, entry->name); // skip \0 suffix
+    if(err != EXIT_SUCCESS) { fferror_print(__FILE__, __LINE__, __func__, ""); return EXIT_FAILURE;}
+  }
+  return EXIT_SUCCESS;
+}
+
+/* XXX not implemented yet, the functionality is provided by ffindex_unpack.c though */
+int ffindex_restore(FILE *data_file, FILE *index_file, char *output_dir_name)
 {
   return -1;
 }

@@ -155,11 +155,7 @@ int main(int argn, char **argv)
       size_t data_size;
       char *data_to_add = ffindex_mmap_data(data_file_to_add, &data_size);
       ffindex_index_t* index_to_add = ffindex_index_parse(index_file_to_add, 0);
-      for(size_t entry_i = 0; entry_i < index_to_add->n_entries; entry_i++)
-      {
-        ffindex_entry_t *entry = ffindex_get_entry_by_index(index_to_add, entry_i);
-        ffindex_insert_memory(data_file, index_file, &offset, ffindex_get_data_by_entry(data_to_add, entry), entry->length - 1, entry->name); // skip \0 suffix
-      }
+      ffindex_insert_ffindex(data_file, index_file, &offset, data_to_add, index_to_add);
     }
   }
 
