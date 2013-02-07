@@ -41,6 +41,44 @@ char* ffindex_copyright()
   return ffindex_copyright_text;
 }
 
+/* return *out_data_file, *out_index_file, out_offset.
+ Setting to a given offset could be supported with a special mode.
+ */
+int ffindex_index_open(char *data_filename, char *index_filename, char* mode, FILE **out_data_file, FILE **out_index_file, size_t *out_offset)
+{
+  /* open index and data file, seek to end if needed */
+  if(mode[0] == 'a')
+  {
+    *out_data_file  = fopen(data_filename, "a");
+    if(*out_data_file == NULL) { perror(data_filename); return EXIT_FAILURE; }
+
+    *out_index_file = fopen(index_filename, "a+");
+    if(*out_index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
+
+    struct stat sb;
+    fstat(fileno(*out_index_file), &sb);
+    fseek(*out_index_file, sb.st_size, SEEK_SET);
+
+    fstat(fileno(*out_data_file), &sb);
+    fseek(*out_data_file, sb.st_size, SEEK_SET);
+    *out_offset = sb.st_size;
+  }
+  else
+  {
+    struct stat st;
+
+    if(stat(data_filename, &st) == 0) { errno = EEXIST; perror(data_filename); return EXIT_FAILURE; }
+    *out_data_file  = fopen(data_filename, "w");
+    if(*out_data_file == NULL) { perror(data_filename); return EXIT_FAILURE; }
+
+    if(stat(index_filename, &st) == 0) { errno = EEXIST; perror(index_filename); return EXIT_FAILURE; }
+    *out_index_file = fopen(index_filename, "w+");
+    if(*out_index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
+
+    *out_offset = 0;
+  }
+  return EXIT_SUCCESS;
+}
 
 /* Insert a memory chunk (string even without \0) into ffindex */
 int ffindex_insert_memory(FILE *data_file, FILE *index_file, size_t *offset, char *from_start, size_t from_length, char *name)
