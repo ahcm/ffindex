@@ -122,7 +122,7 @@ int main(int argn, char **argv)
       for(int i = optind; i < argn; i++)
         index = ffindex_unlink(index, argv[i]);
     }
-    else
+    else // unused
     {
       char** sorted_names_to_unlink = malloc(FFINDEX_MAX_INDEX_ENTRIES_DEFAULT * sizeof(char *));
       if(sorted_names_to_unlink == NULL)
@@ -157,6 +157,13 @@ int main(int argn, char **argv)
         err += ffindex_write(index, index_file);
       }
     }
+  }
+  else if(sort)
+  {
+    ffindex_sort_index_file(index);
+    index_file = fopen(index_filename, "w");
+    if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
+    err += ffindex_write(index, index_file);
   }
 
   /* Write index back */
