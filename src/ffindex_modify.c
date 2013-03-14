@@ -30,14 +30,18 @@
 
 void usage(char *program_name)
 {
-    fprintf(stderr, "USAGE: %s [-s|-u|-v] [-t] [-f file]* index_filename [filename]*\n"
+    fprintf(stderr, "USAGE: %s -s|-u [-v] [-f file]* index_filename [filename]*\n"
                     "\t-f file\tfile each line containing a filename\n"
                     "\t\t-f can be specified up to %d times\n"
                     "\t-s\tsort index file\n"
                     "\t-u\tunlink entry (remove from index only)\n"
                     "\t-v\tprint version and other info then exit\n"
+                    "EXAMPLE:\n"
+                    "\t%s -us foo.ffindex entry1\n"
+                    "\tTo clean up the data file after unlinking insert it to an new one:\n"
+                    "\tffindex_build -as cleaned.ffdata cleaned.ffindex -d foo.ffdata -i foo.ffindex\n"
                     "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n",
-                    program_name, MAX_FILENAME_LIST_FILES);
+                    program_name, MAX_FILENAME_LIST_FILES, program_name);
 }
 
 int main(int argn, char **argv)
@@ -122,7 +126,7 @@ int main(int argn, char **argv)
       for(int i = optind; i < argn; i++)
         index = ffindex_unlink(index, argv[i]);
     }
-    else
+    else // unused
     {
       char** sorted_names_to_unlink = malloc(FFINDEX_MAX_INDEX_ENTRIES_DEFAULT * sizeof(char *));
       if(sorted_names_to_unlink == NULL)
@@ -157,6 +161,13 @@ int main(int argn, char **argv)
         err += ffindex_write(index, index_file);
       }
     }
+  }
+  else if(sort)
+  {
+    ffindex_sort_index_file(index);
+    index_file = fopen(index_filename, "w");
+    if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
+    err += ffindex_write(index, index_file);
   }
 
   /* Write index back */
