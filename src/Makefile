@@ -3,7 +3,7 @@ libdir=`([ -d /usr/lib64 ] && echo lib64) || echo lib`
 LANG=C
 CC=gcc -fopenmp
 #CC=icc -openmp
-CFLAGS+=-std=c99 -O2 -g -fPIC -Wall -pedantic
+CFLAGS+=-std=c99 -O2 -g -fPIC -Wall -pedantic -D_GNU_SOURCE=1
 LDFLAGS=-lffindex -L.
 ifdef FFINDEX_STATIC
 	LDFLAGS+=-static
