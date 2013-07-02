@@ -173,7 +173,7 @@ int main(int argn, char **argv)
   char *data_filename_out  = NULL,
        *index_filename_out = NULL;
 
-  while ((opt = getopt(argn, argv, "d:i:m")) != -1)
+  while ((opt = getopt(argn, argv, "d:i:mq")) != -1)
   {
     switch (opt)
     {
