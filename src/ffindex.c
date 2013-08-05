@@ -84,30 +84,35 @@ int ffindex_index_open(char *data_filename, char *index_filename, char* mode, FI
 int ffindex_insert_memory(FILE *data_file, FILE *index_file, size_t *offset, char *from_start, size_t from_length, char *name)
 {
     int myerrno = 0;
+    size_t write_size;
     size_t offset_before = *offset;
-    size_t write_size = fwrite(from_start, sizeof(char), from_length, data_file);
+
+    /* Write data */
+    write_size = fwrite(from_start, sizeof(char), from_length, data_file);
     *offset += write_size;
     if(from_length != write_size)
+    {
+      myerrno = errno;
       fferror_print(__FILE__, __LINE__, __func__, name);
+      goto EXCEPTION_ffindex_insert_memory;
+    }
 
     /* Seperate by '\0' and thus also make sure at least one byte is written */
     char buffer[1] = {'\0'};
     if(fwrite(buffer, sizeof(char), 1, data_file) != 1)
-      perror("ffindex_insert_memory");
-    *offset += 1;
-    if(ferror(data_file) != 0)
+    {
+      myerrno = errno;
+      fferror_print(__FILE__, __LINE__, __func__, name);
       goto EXCEPTION_ffindex_insert_memory;
+    }
 
-    /* write index entry */
+    *offset += 1;
+
+    /* Write index entry */
     fprintf(index_file, "%s\t%zd\t%zd\n", name, offset_before, *offset - offset_before);
 
-    return myerrno;
-
 EXCEPTION_ffindex_insert_memory:
-    {
-      fferror_print(__FILE__, __LINE__, __func__, "");
-      return myerrno;
-    }
+    return myerrno;
 }
 
 
