@@ -327,7 +327,7 @@ int main(int argn, char **argv)
       }
       else
       {
-        fprintf("merge command failed: %s\n", merge_command);
+        fprintf(stderr, "merge command failed: %s\n", merge_command);
         goto EXCEPTION;
       }
     }
