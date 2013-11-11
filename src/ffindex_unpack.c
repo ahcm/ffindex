@@ -1,6 +1,6 @@
 /*
  * FFindex
- * written by Andy Hauser <hauser@genzentrum.lmu.de>.
+ * written by Andreas Hauser <andy@splashground.de>.
  * Please add your name here if you distribute modified versions.
  * 
  * FFindex is provided under the Create Commons license "Attribution-ShareAlike
@@ -34,7 +34,7 @@ int main(int argn, char **argv)
   if(argn < 4)
   {
     fprintf(stderr, "USAGE: %s DATA_FILENAME INDEX_FILENAME OUT_DIR\n"
-                    "\nDesigned and implemented by Andy Hauser <hauser@genzentrum.lmu.de>.\n",
+                    FFINDEX_COPYRIGHT,
                     argv[0]);
     return -1;
   }

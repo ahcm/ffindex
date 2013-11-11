@@ -1,6 +1,6 @@
 /*
  * Ffindex
- * written by Andy Hauser <hauser@genzentrum.lmu.de>.
+ * written by Andreas Hauser <andy@splashground.de>.
  * Please add your name here if you distribute modified versions.
  * 
  * Ffindex is provided under the Create Commons license "Attribution-ShareAlike
@@ -22,6 +22,8 @@
 #include <stdio.h>
 
 #define FFINDEX_VERSION 0.992
+#define FFINDEX_COPYRIGHT "\nDesigned and implemented by Andreas Hauser <andy@splashground.de>.\n"
+
 #define FFINDEX_MAX_INDEX_ENTRIES_DEFAULT 80000000
 #define FFINDEX_MAX_ENTRY_NAME_LENTH 63
 

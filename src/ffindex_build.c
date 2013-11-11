@@ -1,6 +1,6 @@
 /*
- * Ffindex
- * written by Andy Hauser <hauser@genzentrum.lmu.de>.
+ * FFindex
+ * written by Andreas Hauser <andy@splashground.de>.
  * Please add your name here if you distribute modified versions.
  * 
  * Ffindex is provided under the Create Commons license "Attribution-ShareAlike
@@ -51,7 +51,7 @@ void usage(char *program_name)
                     "\nNOTE:\n"
                     "\tMaximum key/filename length is %d and maximum entries are by default %d\n"
                     "\tThis can be changed in the sources.\n"
-                    "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n",
+                    FFINDEX_COPYRIGHT,
                     program_name, MAX_FILENAME_LIST_FILES, FFINDEX_MAX_ENTRY_NAME_LENTH, FFINDEX_MAX_INDEX_ENTRIES_DEFAULT);
 }
 
@@ -96,7 +96,7 @@ int main(int argn, char **argv)
   if(version == 1)
   {
     /* Don't you dare running it on a platform where byte != 8 bits */
-    printf("%s version %.2f, off_t = %zd bits\n", argv[0], FFINDEX_VERSION, sizeof(off_t) * 8);
+    printf("%s version: %.3f (off_t = %zd bits)\n", argv[0], FFINDEX_VERSION, sizeof(off_t) * 8);
     return EXIT_SUCCESS;
   }
 

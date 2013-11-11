@@ -1,6 +1,6 @@
 /*
  * Ffindex
- * written by Andy Hauser <hauser@genzentrum.lmu.de>.
+ * written by Andreas Hauser <andy@splashground.de>.
  * Please add your name here if you distribute modified versions.
  * 
  * Ffindex is provided under the Create Commons license "Attribution-ShareAlike

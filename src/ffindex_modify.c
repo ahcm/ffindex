@@ -1,6 +1,6 @@
 /*
  * Ffindex
- * written by Andy Hauser <hauser@genzentrum.lmu.de>.
+ * written by Andreas Hauser <andy@splashground.de>.
  * Please add your name here if you distribute modified versions.
  * 
  * Ffindex is provided under the Create Commons license "Attribution-ShareAlike
@@ -40,7 +40,7 @@ void usage(char *program_name)
                     "\t%s -us foo.ffindex entry1\n"
                     "\tTo clean up the data file after unlinking insert it to an new one:\n"
                     "\tffindex_build -as cleaned.ffdata cleaned.ffindex -d foo.ffdata -i foo.ffindex\n"
-                    "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n",
+                    FFINDEX_COPYRIGHT,
                     program_name, MAX_FILENAME_LIST_FILES, program_name);
 }
 

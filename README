@@ -1,6 +1,6 @@
 * Copyright
 
-FFindex was written by Andy Hauser <hauser@genzentrum.lmu.de>.
+FFindex was written by Andreas Hauser <andy@splpashground.de>.
 Please add your name here if you distribute modified versions.
 
 FFindex is provided under the Create Commons license "Attribution-ShareAlike 3.0",
@@ -50,6 +50,8 @@ $ make install INSTALL_DIR=.. HAVE_MPI=1
 Please note that before querying or unlinking entries a ffindex must be
 sorted, although you can add to it without. So either specify -s with
 ffindex_build or sorted later with ffindex_modify -s.
+Also the length of the entry names is restricted. See the usage output of
+the ffindex_build program.
 
 Setup environment:
 $ export PATH="$INSTALL_DIR/bin:$PATH"

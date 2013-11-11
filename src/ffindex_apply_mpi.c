@@ -1,6 +1,6 @@
 /*
  * FFindex
- * written by Andy Hauser <hauser@genzentrum.lmu.de>.
+ * written by Andreas Hauser <andy@splashground.de>.
  * Please add your name here if you distribute modified versions.
  * 
  * FFindex is provided under the Create Commons license "Attribution-ShareAlike
@@ -206,7 +206,7 @@ int main(int argn, char **argv)
                     "\t\tThis is useful for large MPI Jobs where merge time might be accounted.\n"
                     "\t-d\tFFDATA output file, stdout of program will be captured\n"
                     "\t-i\tFFINDEX output file, entries get the same name as input entry\n"
-                    "\nDesigned and implemented by Andy Hauser <hauser@genzentrum.lmu.de>.\n",
+                    FFINDEX_COPYRIGHT,
                     argv[0]);
     errno = EINVAL;
     goto EXCEPTION;

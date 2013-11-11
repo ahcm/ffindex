@@ -1,6 +1,6 @@
 /*
  * FFindex
- * written by Andy Hauser <hauser@genzentrum.lmu.de>.
+ * written by Andreas Hauser <andy@splashground.de>.
  * Please add your name here if you distribute modified versions.
  * 
  * FFindex is provided under the Create Commons license "Attribution-ShareAlike
@@ -33,7 +33,8 @@ void usage(char *program_name)
 {
     fprintf(stderr, "USAGE: %s -v | [-s] data_filename index_filename fasta_filename\n"
                     "\t-s\tsort index file\n"
-                    "\nDesigned and implemented by Andreas W. Hauser <hauser@genzentrum.lmu.de>.\n", program_name);
+                    FFINDEX_COPYRIGHT,
+                    program_name);
 }
 
 int main(int argn, char **argv)

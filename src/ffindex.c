@@ -1,6 +1,6 @@
 /*
  * Ffindex
- * written by Andy Hauser <hauser@genzentrum.lmu.de>.
+ * written by Andreas Hauser <andy@splashground.de>.
  * Please add your name here if you distribute modified versions.
  * 
  * Ffindex is provided under the Create Commons license "Attribution-ShareAlike
@@ -34,7 +34,7 @@
 /* XXX Use page size? */
 #define FFINDEX_BUFFER_SIZE 4096
 
-char* ffindex_copyright_text = "Designed and implemented by Andy Hauser <hauser@genzentrum.lmu.de>.";
+char* ffindex_copyright_text = FFINDEX_COPYRIGHT;
 
 char* ffindex_copyright()
 {

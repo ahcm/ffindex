@@ -1,6 +1,6 @@
 /*
  * Ffindex
- * written by Andy Hauser <hauser@genzentrum.lmu.de>.
+ * written by Andreas Hauser <andy@splashground.de>.
  * Please add your name here if you distribute modified versions.
  * 
  * Ffindex is provided under the Create Commons license "Attribution-ShareAlike
@@ -35,7 +35,7 @@ void usage(char *program_name)
                     "\t-d FFDATA_FILE\tinput ffindex data file to be optimized\n"
                     "\t-i FFINDEX_FILE\tinput ffindex index file to be optimized\n"
                     "\t-v\t\tprint version and other info then exit\n"
-                    "\nDesigned and implemented by Andy Hauser <hauser@genzentrum.lmu.de>.\n",
+                    FFINDEX_COPYRIGHT,
                     program_name, MAX_FILENAME_LIST_FILES, FFINDEX_MAX_ENTRY_NAME_LENTH, FFINDEX_MAX_INDEX_ENTRIES_DEFAULT);
 }
 
