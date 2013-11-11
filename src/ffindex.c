@@ -302,15 +302,20 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   if(index->index_data == MAP_FAILED)
     return NULL;
   index->type = SORTED_ARRAY; /* XXX Assume a sorted file for now */
-  int i = 0;
-  char* d = index->index_data;
-  char* end;
+
   /* Faster than scanf per line */
+  size_t names_too_long = 0;
+  char* d = index->index_data;
+  int i;
   for(i = 0; d < (index->index_data + index->index_data_size); i++)
   {
+    char* end;
     int p;
     for(p = 0; *d != '\t'; d++)
-      index->entries[i].name[p++] = *d;
+      if(p < FFINDEX_MAX_ENTRY_NAME_LENTH)
+        index->entries[i].name[p++] = *d;
+      else
+        names_too_long++;
     index->entries[i].name[p] = '\0';
     index->entries[i].offset = strtol(d, &end, 10);
     d = end;
@@ -321,7 +326,15 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   index->n_entries = i;
 
   if(index->n_entries == 0)
-    warn("index with 0 entries");
+    warnx("index with 0 entries");
+
+  if(names_too_long)
+  {
+    errno = ENAMETOOLONG;
+    warn("Cut-off is %d characters. Are they still unique?"
+         " Warning encountered %zd times", FFINDEX_MAX_ENTRY_NAME_LENTH, names_too_long);
+    errno = 0;
+  }
 
   return index;
 }

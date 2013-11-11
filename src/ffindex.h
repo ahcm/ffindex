@@ -23,14 +23,14 @@
 
 #define FFINDEX_VERSION 0.980
 #define FFINDEX_MAX_INDEX_ENTRIES_DEFAULT 40000000
-#define FFINDEX_MAX_ENTRY_NAME_LENTH 32
+#define FFINDEX_MAX_ENTRY_NAME_LENTH 35
 
 enum ffindex_type { PLAIN_FILE, SORTED_FILE, SORTED_ARRAY, TREE };
 
 typedef struct ffindex_entry {
   size_t offset;
   size_t length;
-  char name[FFINDEX_MAX_ENTRY_NAME_LENTH];
+  char name[FFINDEX_MAX_ENTRY_NAME_LENTH + 1];
 } ffindex_entry_t;
 
 typedef struct ffindex_index {
