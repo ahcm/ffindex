@@ -14,7 +14,7 @@ endif
 
 #-Wl,--version-script=libffindex.map
 
-OBJECTS=ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so ffindex_unpack
+OBJECTS=ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so ffindex_unpack ffindex_from_tsv
 
 ifdef HAVE_MPI
 OBJECTS+=ffindex_apply_mpi
@@ -34,6 +34,9 @@ ffindex_apply_mpi.o: ffindex_apply_mpi.c ffindex.h
 
 ffindex_from_fasta: $(FFINDEX_OBJECTS) ffindex_from_fasta.o ffindex.h
 	$(CC) -o $@ ffindex_from_fasta.o $(LDFLAGS) -L. -lffindex
+
+ffindex_from_tsv: $(FFINDEX_OBJECTS) ffindex_from_tsv.o ffindex.h
+	$(CC) -o $@ ffindex_from_tsv.o $(LDFLAGS) -L. -lffindex
 
 ffindex_get: $(FFINDEX_OBJECTS) ffindex_get.o ffindex.h
 	$(CC) -o $@ ffindex_get.o $(LDFLAGS) -L. -lffindex
