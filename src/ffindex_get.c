@@ -25,6 +25,7 @@
 void usage(char* program_name)
 {
     fprintf(stderr, "USAGE: %s data_filename index_filename entry name(s)\n"
+                    "\t-f FILE\t\tfile containing a list of file names, one per line\n"
                     "-n\tuse index of entry instead of entry name\n"
                     FFINDEX_COPYRIGHT,
                     program_name);
@@ -34,10 +35,15 @@ int main(int argn, char **argv)
 {
   int by_index = 0;
   int opt;
-  while ((opt = getopt(argn, argv, "n")) != -1)
+  char* list_filenames[4096];
+  size_t list_filenames_index = 0;
+  while ((opt = getopt(argn, argv, "f:n")) != -1)
   {
     switch (opt)
     {
+      case 'f':
+        list_filenames[list_filenames_index++] = optarg;
+        break;
       case 'n':
         by_index = 1;
         break;
@@ -97,6 +103,39 @@ int main(int argn, char **argv)
   }
   else // by name
   {
+    // get names given by file
+    if(list_filenames_index > 0)
+    {
+      for(int i = 0; i < list_filenames_index; i++)
+      {
+        FILE *list_file = fopen(list_filenames[i], "r");
+        if( list_file == NULL) { perror(list_filenames[i]); return EXIT_FAILURE; }
+
+        char name[PATH_MAX];
+        while(fgets(name, PATH_MAX, list_file) != NULL)
+        {
+          ffindex_entry_t* entry = ffindex_get_entry_by_name(index, ffnchomp(name, strlen(name)));
+          if(entry == NULL)
+          {
+            errno = ENOENT; 
+            fferror_print(__FILE__, __LINE__, "ffindex_get key not found in index", name);
+          }
+          else
+          {
+            char *filedata = ffindex_get_data_by_entry(data, entry);
+            if(filedata == NULL)
+            {
+              errno = ENOENT; 
+              fferror_print(__FILE__, __LINE__, "ffindex_get key not found in index", name);
+            }
+            else
+              fwrite(filedata, entry->length - 1, 1, stdout);
+          }
+        }
+      }
+    }
+
+    // get files given on command line
     for(int i = optind; i < argn; i++)
     {
       char *filename = argv[i];
