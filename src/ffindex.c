@@ -298,9 +298,12 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   index->file = index_file;
   index->index_data = ffindex_mmap_data(index_file, &(index->index_data_size));
   if(index->index_data_size == 0)
-    warn("Problem with data file. Is it empty or is another process readning it?");
+    warn("Problem with data file. Is it empty or is another process reading it?");
   if(index->index_data == MAP_FAILED)
+  {
+    free(index);
     return NULL;
+  }
   index->type = SORTED_ARRAY; /* XXX Assume a sorted file for now */
 
   /* Faster than scanf per line */
