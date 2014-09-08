@@ -63,6 +63,18 @@ int ffindex_index_open(char *data_filename, char *index_filename, char* mode, FI
     fseek(*out_data_file, sb.st_size, SEEK_SET);
     *out_offset = sb.st_size;
   }
+  else if(mode[0] == 'r')
+  {
+    struct stat st;
+
+    *out_data_file  = fopen(data_filename, "r");
+    if(*out_data_file == NULL) { perror(data_filename); return EXIT_FAILURE; }
+
+    *out_index_file = fopen(index_filename, "r");
+    if(*out_index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
+
+    *out_offset = 0;
+  }
   else
   {
     struct stat st;

@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/mman.h>
 
 
 #include "ffindex.h"
@@ -34,6 +35,7 @@ int main(int argn, char **argv)
   if(argn < 4)
   {
     fprintf(stderr, "USAGE: %s DATA_FILENAME INDEX_FILENAME OUT_DIR\n"
+                    "\n\tPlease note that a huge number of files might be created!\n"
                     FFINDEX_COPYRIGHT,
                     argv[0]);
     return -1;
@@ -50,6 +52,7 @@ int main(int argn, char **argv)
 
   size_t data_size;
   char *data = ffindex_mmap_data(data_file, &data_size);
+  madvise(data, data_size, MADV_SEQUENTIAL);
 
   ffindex_index_t* index = ffindex_index_parse(index_file, 0);
   if(index == NULL)
@@ -74,10 +77,10 @@ int main(int argn, char **argv)
 
     FILE *output_file = fopen(entry->name, "w");
 
-    // Write file data to child's stdin.
+    // Write to file 
     char *filedata = ffindex_get_data_by_entry(data, entry);
     size_t written = fwrite(filedata, entry->length - 1, 1, output_file);
-    if(written < 1)   { perror(entry->name); break; }
+    if(written < 1)   { perror(entry->name); }
 
     fclose(output_file);
   }
