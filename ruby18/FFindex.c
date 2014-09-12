@@ -67,15 +67,18 @@ VALUE method_ffindex_get_data_by_index(VALUE self, VALUE key)
   
   size_t index = FIX2INT(key);
   ffindex_entry_t * entry = ffindex_get_entry_by_index(ffindex_db->ffindex, index);
-  char * data = ffindex_get_data_by_entry(ffindex_db->ffdata, entry);
-
-  return rb_str_new2(data);
+  if(entry)
+  {
+    char * data = ffindex_get_data_by_entry(ffindex_db->ffdata, entry);
+    return rb_str_new2(data);
+  }
+  else
+    return Qnil;
 }
 
 
 VALUE method_ffindex_get_data_by_name(VALUE self, VALUE key)
 {
-  
   Check_Type(key, T_STRING);
   char * name = calloc(RSTRING_LEN(key) + 1, sizeof(char));
   memcpy(name, StringValuePtr(key), RSTRING_LEN(key));
@@ -83,7 +86,11 @@ VALUE method_ffindex_get_data_by_name(VALUE self, VALUE key)
   ffindex_db_t * ffindex_db;
   Data_Get_Struct(self, ffindex_db_t, ffindex_db);
   ffindex_entry_t * entry = ffindex_get_entry_by_name(ffindex_db->ffindex, name);
-  char * data = ffindex_get_data_by_entry(ffindex_db->ffdata, entry);
-
-  return rb_str_new2(data);
+  if(entry)
+  {
+    char * data = ffindex_get_data_by_entry(ffindex_db->ffdata, entry);
+    return rb_str_new2(data);
+  }
+  else
+    return Qnil;
 }
