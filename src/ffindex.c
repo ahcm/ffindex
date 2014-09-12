@@ -41,6 +41,20 @@ char* ffindex_copyright()
   return ffindex_copyright_text;
 }
 
+
+ffindex_db_t * ffindex_index_db_open(ffindex_db_t * ffindex_db)
+{
+  int ret = ffindex_index_open(ffindex_db->ffdata_filename, ffindex_db->ffindex_filename, ffindex_db->mode, &ffindex_db->ffdata_file, &ffindex_db->ffindex_file, &ffindex_db->offset);
+  if(ret)
+    return NULL;
+
+  ffindex_db->ffindex = ffindex_index_parse(ffindex_db->ffindex_file, ffindex_db->num_max_entries);
+  ffindex_db->ffdata = ffindex_mmap_data(ffindex_db->ffdata_file, &ffindex_db->ffdata_size);
+
+  return ffindex_db;
+}
+
+
 /* return *out_data_file, *out_index_file, out_offset.
  Setting to a given offset could be supported with a special mode.
  */
@@ -65,8 +79,6 @@ int ffindex_index_open(char *data_filename, char *index_filename, char* mode, FI
   }
   else if(mode[0] == 'r')
   {
-    struct stat st;
-
     *out_data_file  = fopen(data_filename, "r");
     if(*out_data_file == NULL) { perror(data_filename); return EXIT_FAILURE; }
 

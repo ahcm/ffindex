@@ -60,20 +60,17 @@ int main(int argn, char **argv)
   char *data_filename  = argv[optind++];
   char *index_filename = argv[optind++];
 
-  FILE *data_file  = fopen(data_filename,  "r");
-  FILE *index_file = fopen(index_filename, "r");
+  ffindex_db_t * ffindex_db = calloc(1, sizeof(ffindex_db_t));
+  ffindex_db->ffdata_filename = data_filename;
+  ffindex_db->ffindex_filename = index_filename;
+  ffindex_db->mode[0] = 'r';
 
-  if( data_file == NULL) { fferror_print(__FILE__, __LINE__, "ffindex_get", data_filename);  exit(EXIT_FAILURE); }
-  if(index_file == NULL) { fferror_print(__FILE__, __LINE__, "ffindex_get", index_filename);  exit(EXIT_FAILURE); }
-
-  size_t data_size;
-  char *data = ffindex_mmap_data(data_file, &data_size);
-
-  ffindex_index_t* index = ffindex_index_parse(index_file, 0);
-  if(index == NULL)
+  ffindex_db = ffindex_index_db_open(ffindex_db);
+  if(!ffindex_db)
   {
-    fferror_print(__FILE__, __LINE__, "ffindex_index_parse", index_filename);
-    exit(EXIT_FAILURE);
+    errno = EINVAL;
+    fferror_print(__FILE__, __LINE__, "ffindex_index_db_open failed", argv[0]);
+    return EXIT_FAILURE;
   }
 
   if(by_index)
@@ -82,7 +79,7 @@ int main(int argn, char **argv)
     {
       size_t index_n = atol(argv[i]) - 1; // offset from 0 but specify from 1
 
-      ffindex_entry_t* entry = ffindex_get_entry_by_index(index, index_n);
+      ffindex_entry_t* entry = ffindex_get_entry_by_index(ffindex_db->ffindex, index_n);
       if(entry == NULL)
       {
         errno = ENOENT; 
@@ -90,7 +87,7 @@ int main(int argn, char **argv)
       }
       else
       {
-        char *filedata = ffindex_get_data_by_entry(data, entry);
+        char *filedata = ffindex_get_data_by_entry(ffindex_db->ffdata, entry);
         if(filedata == NULL)
         {
           errno = ENOENT; 
@@ -114,7 +111,7 @@ int main(int argn, char **argv)
         char name[PATH_MAX];
         while(fgets(name, PATH_MAX, list_file) != NULL)
         {
-          ffindex_entry_t* entry = ffindex_get_entry_by_name(index, ffnchomp(name, strlen(name)));
+          ffindex_entry_t* entry = ffindex_get_entry_by_name(ffindex_db->ffindex, ffnchomp(name, strlen(name)));
           if(entry == NULL)
           {
             errno = ENOENT; 
@@ -122,7 +119,7 @@ int main(int argn, char **argv)
           }
           else
           {
-            char *filedata = ffindex_get_data_by_entry(data, entry);
+            char *filedata = ffindex_get_data_by_entry(ffindex_db->ffdata, entry);
             if(filedata == NULL)
             {
               errno = ENOENT; 
@@ -140,7 +137,7 @@ int main(int argn, char **argv)
     {
       char *filename = argv[i];
 
-      ffindex_entry_t* entry = ffindex_get_entry_by_name(index, filename);
+      ffindex_entry_t* entry = ffindex_get_entry_by_name(ffindex_db->ffindex, filename);
       if(entry == NULL)
       {
         errno = ENOENT; 
@@ -148,7 +145,7 @@ int main(int argn, char **argv)
       }
       else
       {
-        char *filedata = ffindex_get_data_by_entry(data, entry);
+        char *filedata = ffindex_get_data_by_entry(ffindex_db->ffdata, entry);
         if(filedata == NULL)
         {
           errno = ENOENT; 
