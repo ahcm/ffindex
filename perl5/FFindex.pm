@@ -1,3 +1,7 @@
+#
+# A simple perl native Module interfacing FFindex
+# written by Andreas Hauser <andreas-source@creative-memory.de
+#
 
 package FFindex;
 
@@ -29,7 +33,7 @@ sub new
     my $i = 0;
     while( my $line = <$fh>)
     {   
-      chomp;
+      chomp $line;
       my ($name, $offset, $len) = split(/\t/, $line);
       $self->{ffindex}[$i] = [$name, $offset, $len];
       $self->{ffindex_hash}{$name} = $self->{ffindex}[$i];
@@ -40,11 +44,27 @@ sub new
     return $self;
 }
 
+
 sub get_num_entries()
 {
   my( $self ) = @_;
   return $self->{n_entries};
 }
+
+
+sub get_entry_by_index()
+{
+  my( $self, $index ) = @_;
+  return $self->{ffindex}[$index];
+}
+
+
+sub get_entry_by_name()
+{
+  my( $self, $qname ) = @_;
+  return $self->{ffindex_hash}{$qname};
+}
+
 
 sub get_data_by_index()
 {
@@ -52,6 +72,7 @@ sub get_data_by_index()
   my ($name, $offset, $len) = @{$self->{ffindex}[$index]};
   return substr($self->{ffdata}, $offset, $len - 1);
 }
+
 
 sub get_data_by_name()
 {
