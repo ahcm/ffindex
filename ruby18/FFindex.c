@@ -17,6 +17,8 @@ VALUE method_ffindex_get_data_by_name(VALUE self, VALUE key);
 
 VALUE method_ffindex_each_data(VALUE self, VALUE key);
 
+VALUE method_ffindex_collect_data(VALUE self, VALUE key);
+
 
 void Init_ffindex()
 {
@@ -26,6 +28,7 @@ void Init_ffindex()
   rb_define_method(FFindex, "get_data_by_index", method_ffindex_get_data_by_index, 1);
   rb_define_method(FFindex, "get_data_by_name", method_ffindex_get_data_by_name, 1);
   rb_define_method(FFindex, "each_data", method_ffindex_each_data, 0);
+  rb_define_method(FFindex, "collect_data", method_ffindex_collect_data, 0);
 }
 
 static void ffindex_db_deallocate(void * ffindex_db)
@@ -115,6 +118,26 @@ VALUE method_ffindex_each_data(VALUE self, VALUE key)
   }
 
   return INT2FIX(i);
+}
+
+
+VALUE method_ffindex_collect_data(VALUE self, VALUE key)
+{
+  if(!rb_block_given_p())
+    rb_raise(rb_eArgError, "a block is required");
+
+  ffindex_db_t * ffindex_db;
+  Data_Get_Struct(self, ffindex_db_t, ffindex_db);
+
+  size_t num_entries = ffindex_db->ffindex->n_entries;
+  size_t i;
+  VALUE arr = rb_ary_new();
+  for(i = 0; i < num_entries; i++)
+  {
+    rb_ary_push(arr, rb_yield(rb_funcall(self, rb_intern("get_data_by_index"), 1, INT2FIX(i))));
+  }
+
+  return arr;
 }
 
 
