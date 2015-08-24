@@ -90,4 +90,4 @@ $ mpirun -np 4 ffindex_apply_mpi fasta.ffdata fasta.ffindex -- wc -c
 
 Parallel version for counting the characters including header in each entry and
 saving the output to a new ffindex:
-$ mpirun -np 4 ffindex_apply_mpi fasta.ffdata fasta.ffindex -i out-wc.ffindex -o out-wc.ffdata -- wc -c
+$ mpirun -np 4 ffindex_apply_mpi fasta.ffdata fasta.ffindex -i out-wc.ffindex -d out-wc.ffdata -- wc -c
