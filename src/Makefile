@@ -1,6 +1,8 @@
 INSTALL_DIR?=..
 libdir=`([ -d /usr/lib64 ] && echo lib64) || echo lib`
 LANG=C
+#CC=musl-gcc
+#OMPI_CC=musl-gcc
 CC=gcc -fopenmp
 #CC=icc -openmp
 CFLAGS+=-std=c99 -O2 -g -fPIC -Wall -pedantic -D_GNU_SOURCE=1
@@ -24,13 +26,23 @@ all: $(OBJECTS)
 
 ffindex.o: ffindex.c ffindex.h ffutil.h
 
+ffindex_apply.o: ffindex_apply_mpi.c ffindex.h
+	$(CC) $(CFLAGS) -c ffindex_apply_mpi.c -o $@ 
+
 ffindex_apply: $(FFINDEX_OBJECTS) ffindex_apply.o ffindex.h
+	$(CC) $(CFLAGS) -o $@  ffindex_apply.o $(LDFLAGS)
 
 ffindex_apply_mpi: $(FFINDEX_OBJECTS) ffindex_apply_mpi.o ffindex.h
-	mpicc $(CFLAGS) -o $@  ffindex_apply_mpi.o $(LDFLAGS)
+	mpicc $(CFLAGS) -DHAVE_MPI -o $@  ffindex_apply_mpi.o $(LDFLAGS)
 
 ffindex_apply_mpi.o: ffindex_apply_mpi.c ffindex.h
-	mpicc $(CFLAGS) -c ffindex_apply_mpi.c -o $@ 
+	mpicc $(CFLAGS) -DHAVE_MPI -c ffindex_apply_mpi.c -o $@ 
+
+ffindex_apply_mpi_spawn: $(FFINDEX_OBJECTS) ffindex_apply_mpi_spawn.o ffindex.h
+	mpicc $(CFLAGS) -o $@  ffindex_apply_mpi_spawn.o $(LDFLAGS)
+
+ffindex_apply_mpi_spawn.o: ffindex_apply_mpi_spawn.c ffindex.h
+	mpicc $(CFLAGS) -c ffindex_apply_mpi_spawn.c -o $@ 
 
 ffindex_from_fasta: $(FFINDEX_OBJECTS) ffindex_from_fasta.o ffindex.h
 	$(CC) -o $@ ffindex_from_fasta.o $(LDFLAGS) -L. -lffindex
