@@ -108,6 +108,9 @@ int main(int argn, char **argv)
       /* Build tree */
       index = ffindex_index_as_tree(index);
 
+      /* Tree keeps index sorted */
+      sort = 0;
+
       /* For each list_file unlink all entries */
       if(list_filenames_index > 0)
         for(int i = 0; i < list_filenames_index; i++)
@@ -129,7 +132,8 @@ int main(int argn, char **argv)
     else
       fprintf(stderr, "unused case\n");
   }
-  else if(sort)
+
+  if(sort)
   {
     ffindex_sort_index_file(index);
     index_file = fopen(index_filename, "w");
