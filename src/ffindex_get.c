@@ -26,7 +26,7 @@ void usage(char* program_name)
 {
     fprintf(stderr, "USAGE: %s data_filename index_filename entry name(s)\n"
                     "\t-f FILE\t\tfile containing a list of file names, one per line\n"
-                    "-n\tuse index of entry instead of entry name\n"
+                    "\t-n\t\tuse index of entry instead of entry name\n"
                     FFINDEX_COPYRIGHT,
                     program_name);
 }
