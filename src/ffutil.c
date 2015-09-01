@@ -37,5 +37,17 @@ char* ffnchomp(char *s, size_t len)
   return s;
 }
 
+/* replacement for strtol streamlined for speed */
+unsigned long parse_ulong(const char *s, const char** end)
+{
+  const unsigned int base = 10;
+  unsigned long l = 0UL;
+  unsigned char *c = (unsigned char*)s;
+  for(unsigned int digit = *c-'0'; *c && digit < base; digit = *++c-'0')
+    l = (l * base) + digit;
+  *end = (char *)c;
+  return l;
+}
+
 /* vim: ts=2 sw=2 et
 */
