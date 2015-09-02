@@ -13,4 +13,7 @@ all:
 	$(MAKE) -C src -f $(MFILE) $@
 
 release:
-	hg archive -t tgz ffindex-`cat VERSION`.tar.gz
+	git archive HEAD -o ffindex-`cat VERSION`.tar.gz
+
+relnotes:
+	git log --pretty=format:" - %s%n%b" 
