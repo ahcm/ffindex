@@ -1,10 +1,10 @@
 Summary: FFindex is a very simple index/database for huge amounts of small files. 
 Name: ffindex
-Version: 0.9.9.4
+Version: 0.9.9.5
 Release: 1
 License: Create Commons license "Attribution-ShareAlike 3.0"
 Group: Utilities/System
-Source: http://www.splashground.de/~andy/programs/FFindex/ffindex-0.9.9.4.tar.gz
+Source: http://www.splashground.de/~andy/programs/FFindex/ffindex-0.9.9.5.tar.gz
 %description
 FFindex is a very simple index/database for huge amounts of small files. The
 files are stored concatenated in one big data file, seperated by '\0'. A second
@@ -28,6 +28,7 @@ make install INSTALL_DIR=%{buildroot}%{_prefix}
 /usr/bin/ffindex_get
 /usr/bin/ffindex_modify
 /usr/bin/ffindex_from_fasta
+/usr/bin/ffindex_from_tsv
 /usr/bin/ffindex_apply
 /usr/bin/ffindex_unpack
 /usr/include/ffindex.h
