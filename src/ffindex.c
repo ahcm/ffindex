@@ -332,11 +332,11 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 
   /* Faster than scanf per line */
   size_t names_too_long = 0;
-  char* d = index->index_data;
+  const char* d = index->index_data;
   int i;
   for(i = 0; d < (index->index_data + index->index_data_size); i++)
   {
-    char* end;
+    const char* end;
     int p;
     for(p = 0; *d != '\t'; d++)
       if(p < FFINDEX_MAX_ENTRY_NAME_LENTH)
