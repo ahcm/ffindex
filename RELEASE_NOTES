@@ -1,373 +1,376 @@
 0.9.9.5
+ - Make use of our parse_long for higher startup performance.
 
-- Roll our own parse_ulong instead strtol for speed reasons.
+ - Add RELEASE_NOTES
 
-- Fix usage formatting
+ - Roll our own parse_ulong instead strtol for speed reasons.
 
-- Make more clear that tree is already sorted ffindex_modify.c
+ - Fix usage formatting
 
-- Remove unused code in ffindex_modify.c
+ - Make more clear that tree is already sorted ffindex_modify.c
 
-0.9.9.4 and older
+ - Remove unused code in ffindex_modify.c
 
-- ffindex_apply is now ffindex_apply_mpi without MPI
+0.9.9.4 and before
 
-- Add src/ffindex_apply_mpi_spawn.c, using spawn istead of fork & exec
+ - ffindex_apply is now ffindex_apply_mpi without MPI
 
-- Fix example
+ - Add src/ffindex_apply_mpi_spawn.c, using spawn istead of fork & exec
 
-- Add collect_data
+ - Fix example
 
-- Add Markus Meier
+ - Add collect_data
 
-- perl5/FFindex.pm: Add copyright. Fix entry reading. Add get_entry* methods.
+ - Add Markus Meier
 
-- Add perl5/test.pl
+ - perl5/FFindex.pm: Add copyright. Fix entry reading. Add get_entry* methods.
 
-- Add perl5
+ - Add perl5/test.pl
 
-- Add each_data
+ - Add perl5
 
-- Return Qnil if not found
+ - Add each_data
 
-- Add method_ffindex_get_data_by_name
+ - Return Qnil if not found
 
-- Add first ruby wrapper.
+ - Add method_ffindex_get_data_by_name
 
-- Add ffindex_db
+ - Add first ruby wrapper.
 
-- Add nginx server module
+ - Add ffindex_db
 
-- Fix memory leak on error
+ - Add nginx server module
 
-- ffindex_get: Add -f FILE argument to let the keys to retrieve be specified by a file.
+ - Fix memory leak on error
 
-- Add ffindex_from_tsv to Makefile
+ - ffindex_get: Add -f FILE argument to let the keys to retrieve be specified by a file.
 
-- Add ffindex_from_tsv
+ - Add ffindex_from_tsv to Makefile
 
-- Update RPM spec
+ - Add ffindex_from_tsv
 
-- bump version
+ - Update RPM spec
 
-- Update copyrigths and version.
+ - bump version
 
-- Set higher limits. Update version.
+ - Update copyrigths and version.
 
-- Handle the case where filenames are actually longer than FFINDEX_MAX_ENTRY_NAME_LENTH. This was also security vulnerability.
+ - Set higher limits. Update version.
 
-- fix fprintf
+ - Handle the case where filenames are actually longer than FFINDEX_MAX_ENTRY_NAME_LENTH. This was also security vulnerability.
 
-- Add log_file option to ffindex_apply_mpi and rework error handling.
+ - fix fprintf
 
-- fix getopt
+ - Add log_file option to ffindex_apply_mpi and rework error handling.
 
-- merge
+ - fix getopt
 
-- Add ffindex_optimize
+ - merge
 
-- bumb version
+ - Add ffindex_optimize
 
-- Add -q for quiet
+ - bumb version
 
-- merge
+ - Add -q for quiet
 
-- Better usage info.
+ - merge
 
-- Make sort work independant from unlink.
+ - Better usage info.
 
-- Add ffindex_insert_ffindex().
+ - Make sort work independant from unlink.
 
-- Make use of ffindex_index_open in ffindex_from_fasta
+ - Add ffindex_insert_ffindex().
 
-- Add ffindex_index_open() and use it in ffindex_build.
+ - Make use of ffindex_index_open in ffindex_from_fasta
 
-- Add -D_GNU_SOURCE=1, probably better here than in source.
+ - Add ffindex_index_open() and use it in ffindex_build.
 
-- Bump version
+ - Add -D_GNU_SOURCE=1, probably better here than in source.
 
-- Export FFINDEX_ENTRY_NAME and unlink() temporary ffindexes in ffindex_apply_mpi.
+ - Bump version
 
-- Print entry and return status of ffindex_apply_mpi to stderr. This allows for further processing based on return status.
+ - Export FFINDEX_ENTRY_NAME and unlink() temporary ffindexes in ffindex_apply_mpi.
 
-- Add MPI to README
+ - Print entry and return status of ffindex_apply_mpi to stderr. This allows for further processing based on return status.
 
-- Don't assume string data, make binary data work too.
+ - Add MPI to README
 
-- Add get_entry_by_name as alias for bsearch
+ - Don't assume string data, make binary data work too.
 
-- Fix build for some compilers
+ - Add get_entry_by_name as alias for bsearch
 
-- Ma
+ - Fix build for some compilers
 
-- Another fix for noncapture and cleanup
+ - Ma
 
-- Fix no capture mode
+ - Another fix for noncapture and cleanup
 
-- First beta of apply_mpi output catching to another ffindex
+ - Fix no capture mode
 
-- wip
+ - First beta of apply_mpi output catching to another ffindex
 
-- wip
+ - wip
 
-- apply_mpi now works with capturing output to another ffindex, but I/O can block.
+ - wip
 
-- Better error message
+ - apply_mpi now works with capturing output to another ffindex, but I/O can block.
 
-- More clever root Makefile contributed by Laszlo.
+ - Better error message
 
-- Add thanks
+ - More clever root Makefile contributed by Laszlo.
 
-- Reduce FFINDEX_MAX_ENTRY_NAME_LENTH from 56 to 32 so that by default the malloced space for the index is <2GB. Suggested by Laszlo.
+ - Add thanks
 
-- Add message to indicated number of failed bytes.
+ - Reduce FFINDEX_MAX_ENTRY_NAME_LENTH from 56 to 32 so that by default the malloced space for the index is <2GB. Suggested by Laszlo.
 
-- Bump version to 0.980
+ - Add message to indicated number of failed bytes.
 
-- Add ffindex_unpack to install and spec and bump version to 0.9.8
+ - Bump version to 0.980
 
-- More improvements to usage info for ffindex_build.
+ - Add ffindex_unpack to install and spec and bump version to 0.9.8
 
-- Add better usage info to ffindex_build, proposed by Johannes.
+ - More improvements to usage info for ffindex_build.
 
-- remove modifies -t from usage
+ - Add better usage info to ffindex_build, proposed by Johannes.
 
-- merge
+ - remove modifies -t from usage
 
-- merge
+ - merge
 
-- wip ffindex_apply_mpi.c
+ - merge
 
-- Add ffindex_unpack to unpack all entries/files from an ffindex
+ - wip ffindex_apply_mpi.c
 
-- Bump version to 0.97
+ - Add ffindex_unpack to unpack all entries/files from an ffindex
 
-- Check index out of bounds for ffindex_get_entry_by_index
+ - Bump version to 0.97
 
-- Add some more usage examples to README
+ - Check index out of bounds for ffindex_get_entry_by_index
 
-- Add option -n to ffindex_get to use entry index instead of entry name
+ - Add some more usage examples to README
 
-- Add ifndef wrapper as suggested by Markus.
+ - Add option -n to ffindex_get to use entry index instead of entry name
 
-- Add return check for 1 byte fwrite.
+ - Add ifndef wrapper as suggested by Markus.
 
-- Don't access index before NULL check. Reporter: Laszlo Karjan.
+ - Add return check for 1 byte fwrite.
 
-- Bump version
+ - Don't access index before NULL check. Reporter: Laszlo Karjan.
 
-- Diy OSX build
+ - Bump version
 
-- Bump version to 0.9.6
+ - Diy OSX build
 
-- Fix bug data vs. filedata.
+ - Bump version to 0.9.6
 
-- Use optimized interface
+ - Fix bug data vs. filedata.
 
-- Fix comment
+ - Use optimized interface
 
-- Conditionalize MPI
+ - Fix comment
 
-- Bump version to 0.9.5.
+ - Conditionalize MPI
 
-- Refactor to handle entry lookup outside of ffindex_apply.
+ - Bump version to 0.9.5.
 
-- Handling of left over.
+ - Refactor to handle entry lookup outside of ffindex_apply.
 
-- Add first implementation of ffindex_apply_mpi.c.
+ - Handling of left over.
 
-- Handle EPIPE.
+ - Add first implementation of ffindex_apply_mpi.c.
 
-- Add a first version of ffindex_apply, that executes a program for each entry in the ffindex.
+ - Handle EPIPE.
 
-- Reflect ffindex_fopen rename.
+ - Add a first version of ffindex_apply, that executes a program for each entry in the ffindex.
 
-- Rename ffindex_fopen to ffindex_fopen_by_name. Add ffindex_fopen_by_entry and ffindex_get_data_by_entry.
+ - Reflect ffindex_fopen rename.
 
-- Add hgignore
+ - Rename ffindex_fopen to ffindex_fopen_by_name. Add ffindex_fopen_by_entry and ffindex_get_data_by_entry.
 
-- Clean also .o
+ - Add hgignore
 
-- Add it also to osx
+ - Clean also .o
 
-- Add ffindex_from_fasta to clean
+ - Add it also to osx
 
-- Install ffindex_from_fasta
+ - Add ffindex_from_fasta to clean
 
-- Improve error handling, especially with empty Index file.
+ - Install ffindex_from_fasta
 
-- Add ffindex_get_data_by_index. And rename other ffindex_get functions to be more uniform.
+ - Improve error handling, especially with empty Index file.
 
-- Use ffindex_get() instead of ffindex_fopen() in ffindex_get program.
+ - Add ffindex_get_data_by_index. And rename other ffindex_get functions to be more uniform.
 
-- Add ffindex_get to get entry as string.
+ - Use ffindex_get() instead of ffindex_fopen() in ffindex_get program.
 
-- Raise FFINDEX_MAX_INDEX_ENTRIES_DEFAULT from 6 million to 40 million
+ - Add ffindex_get to get entry as string.
 
-- Make sure ">" is after newline. Better code.
+ - Raise FFINDEX_MAX_INDEX_ENTRIES_DEFAULT from 6 million to 40 million
 
-- Add -O2.
+ - Make sure ">" is after newline. Better code.
 
-- Complete implementation of ffindex_from_fasta.
+ - Add -O2.
 
-- Bump version to 0.94
+ - Complete implementation of ffindex_from_fasta.
 
-- Sart implementation of ffindex_from_fasta
+ - Bump version to 0.94
 
-- Add ffindex_insert_memory().
+ - Sart implementation of ffindex_from_fasta
 
-- Improve README
+ - Add ffindex_insert_memory().
 
-- Bump version to 0.9.3
+ - Improve README
 
-- merge
+ - Bump version to 0.9.3
 
-- Better make chdir
+ - merge
 
-- Make usage of tree default in ffindex_modify.
+ - Better make chdir
 
-- Make OSX compile again.
+ - Make usage of tree default in ffindex_modify.
 
-- basename() is in libgen.h on BSD.
+ - Make OSX compile again.
 
-- Clean ffutil.o too.
+ - basename() is in libgen.h on BSD.
 
-- Add deinstall target
+ - Clean ffutil.o too.
 
-- Fix spec libdir
+ - Add deinstall target
 
-- Fix libdir creation
+ - Fix spec libdir
 
-- bump version
+ - Fix libdir creation
 
-- Fix spec
+ - bump version
 
-- Respect lib64
+ - Fix spec
 
-- nicer
+ - Respect lib64
 
-- Add a SPEC file for building an RPM package.
+ - nicer
 
-- Rework build a little. Build a static library libffindex.a too.
+ - Add a SPEC file for building an RPM package.
 
-- Add top-level Makefile.
+ - Rework build a little. Build a static library libffindex.a too.
 
-- Fix remaining printf.
+ - Add top-level Makefile.
 
-- Fix size_t printfs. Use length modifier z.
+ - Fix remaining printf.
 
-- Bump version.
+ - Fix size_t printfs. Use length modifier z.
 
-- Move textfiles to top.
+ - Bump version.
 
-- Add inclusion clause to LICENSE.
+ - Move textfiles to top.
 
-- Add advertisement.
+ - Add inclusion clause to LICENSE.
 
-- Fix fclose with ffindex_add_filestream.
+ - Add advertisement.
 
-- ffindex_build now can incorporate (merge) other ffindexes.
+ - Fix fclose with ffindex_add_filestream.
 
-- Add -t to ffindex_modify, which tells ffindex to speedup unlinking using a tree.
+ - ffindex_build now can incorporate (merge) other ffindexes.
 
-- unlink: walk to lists implmentation
+ - Add -t to ffindex_modify, which tells ffindex to speedup unlinking using a tree.
 
-- Fix message
+ - unlink: walk to lists implmentation
 
-- Fix unlink.
+ - Fix message
 
-- Fix OS X build
+ - Fix unlink.
 
-- Fix test
+ - Fix OS X build
 
-- Remove more strnlen. Introduce ffnchomp in ffutil that was renamed from fferror.
+ - Fix test
 
-- Use strlen instead of strnlen. Sae case and BSD/OS X do not always have strnlen.
+ - Remove more strnlen. Introduce ffnchomp in ffutil that was renamed from fferror.
 
-- fix includes
+ - Use strlen instead of strnlen. Sae case and BSD/OS X do not always have strnlen.
 
-- little things
+ - fix includes
 
-- better documentation
+ - little things
 
-- Add possibility to add single files not only directories. TODO: Decide what should be the name in the index, that is should the whole path be part of the entry name.
+ - better documentation
 
-- Make INSTALL_DIR usable.
+ - Add possibility to add single files not only directories. TODO: Decide what should be the name in the index, that is should the whole path be part of the entry name.
 
-- Add
+ - Make INSTALL_DIR usable.
 
-- Add ffindex_modify that oprates on an existing index. E.g. for unlinking.
+ - Add
 
-- Guard against overwriting existing index or data file
+ - Add ffindex_modify that oprates on an existing index. E.g. for unlinking.
 
-- Add ffindex_unlink
+ - Guard against overwriting existing index or data file
 
-- better tests
+ - Add ffindex_unlink
 
-- Better error handling
+ - better tests
 
-- comment
+ - Better error handling
 
-- Better error handling
+ - comment
 
-- nicer error handling
+ - Better error handling
 
-- nicer error handling
+ - nicer error handling
 
-- spell
+ - nicer error handling
 
-- Better error handling and messages, especially if malloc failes.
+ - spell
 
-- ffindex_index_parse now takes a second argument specifying the maximum number of entries. A default is used if 0 is specified.
+ - Better error handling and messages, especially if malloc failes.
 
-- Add -v for version. Add -f for list_files.
+ - ffindex_index_parse now takes a second argument specifying the maximum number of entries. A default is used if 0 is specified.
 
-- Small code improvement.
+ - Add -v for version. Add -f for list_files.
 
-- Add fmemopen for Mac OS X.
+ - Small code improvement.
 
-- fix warnings
+ - Add fmemopen for Mac OS X.
 
-- Add install target.
+ - fix warnings
 
-- - Add license. - Add append and sort.
+ - Add install target.
 
-- Faster parsing. ffindex_mmap interface changed.
+ - - Add license. - Add append and sort.
 
-- Convert index to struct. Implement bsearch.
+ - Faster parsing. ffindex_mmap interface changed.
 
-- Rest of data type conversion. Ffindex_build now takes offset return value, which is needed e.g. for multiple directory indexing.
+ - Convert index to struct. Implement bsearch.
 
-- Change *data to from type void* to char* to avoid problems with pointer arithmetics.
+ - Rest of data type conversion. Ffindex_build now takes offset return value, which is needed e.g. for multiple directory indexing.
 
-- Add test for multiple directory indexing
+ - Change *data to from type void* to char* to avoid problems with pointer arithmetics.
 
-- Add second test dir.
+ - Add test for multiple directory indexing
 
-- Make Makefile more robust.
+ - Add second test dir.
 
-- Add more functions to header.
+ - Make Makefile more robust.
 
-- ffindex_get now support multiple entry retrieves.
+ - Add more functions to header.
 
-- Remoove debug extra newlines from ffindex_get output.
+ - ffindex_get now support multiple entry retrieves.
 
-- Remove debug print.
+ - Remoove debug extra newlines from ffindex_get output.
 
-- Add clean.
+ - Remove debug print.
 
-- Add a program to retrieve data from index.
+ - Add clean.
 
-- Fix parameter mixup. Add length to index.
+ - Add a program to retrieve data from index.
 
-- Add test
+ - Fix parameter mixup. Add length to index.
 
-- ffindex_fopen
+ - Add test
 
-- wip
+ - ffindex_fopen
 
-- primitive ffindex_get_offset
+ - wip
 
-- use read
+ - primitive ffindex_get_offset
 
-- init
+ - use read
+
+ - init
