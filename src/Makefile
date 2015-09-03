@@ -114,6 +114,7 @@ install:
 	install ffindex_build $(INSTALL_DIR)/bin/ffindex_build
 	install ffindex_modify $(INSTALL_DIR)/bin/ffindex_modify
 	install ffindex_from_fasta $(INSTALL_DIR)/bin/ffindex_from_fasta
+	install ffindex_from_tsv $(INSTALL_DIR)/bin/ffindex_from_tsv
 	install ffindex_apply $(INSTALL_DIR)/bin/ffindex_apply
 	install ffindex_unpack $(INSTALL_DIR)/bin/ffindex_unpack
 	install libffindex.so.0.1 $(INSTALL_DIR)/$(libdir)/libffindex.so.0.1
@@ -121,6 +122,7 @@ install:
 	ln -sf libffindex.so.0.1 $(INSTALL_DIR)/$(libdir)/libffindex.so
 	install ffindex.h $(INSTALL_DIR)/include/ffindex.h
 	install ffutil.h $(INSTALL_DIR)/include/ffutil.h
+	install ffindex_posix_search.h $(INSTALL_DIR)/include/ffindex_posix_search.h
 ifdef HAVE_MPI
 	install ffindex_apply_mpi $(INSTALL_DIR)/bin/ffindex_apply_mpi
 endif
@@ -129,7 +131,7 @@ deinstall:
 	rm -f $(INSTALL_DIR)/bin/ffindex_get $(INSTALL_DIR)/bin/ffindex_build $(INSTALL_DIR)/bin/ffindex_modify \
 		$(INSTALL_DIR)/$(libdir)/libffindex.so.0.1 $(INSTALL_DIR)/$(libdir)/libffindex.a \
 		$(INSTALL_DIR)/$(libdir)/libffindex.so $(INSTALL_DIR)/include/ffindex.h $(INSTALL_DIR)/include/ffutil.h\
-		$(INSTALL_DIR)/bin/ffindex_from_fasta
+		$(INSTALL_DIR)/include/ffindex_posix_search.h $(INSTALL_DIR)/bin/ffindex_from_fasta $(INSTALL_DIR)/bin/ffindex_from_tsv
 	rmdir $(INSTALL_DIR)/bin || true
 	rmdir $(INSTALL_DIR)/$(libdir) || true
 	rmdir $(INSTALL_DIR)/include || true
