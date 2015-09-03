@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 
-#define FFINDEX_VERSION 0.995
+#define FFINDEX_VERSION 0.996
 #define FFINDEX_COPYRIGHT "\nDesigned and implemented by Andreas Hauser <andy@splashground.de>.\n"
 
 #define FFINDEX_MAX_INDEX_ENTRIES_DEFAULT 80000000

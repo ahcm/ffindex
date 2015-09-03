@@ -1,3 +1,16 @@
+0.9.9.6
+ - Fix OS X builds and integrate Makefile.osx
+
+ - Drop OpenMP from compiler flags
+
+ - Add ffindex_posix_search.o to make clean
+
+ - Avoid non-standard nested function, even so it's the cleanest solution,
+   since the posix twalk interface is broken. Factor out functions using posix
+   tree. Use TLS variables to stay threadsafe.
+
+ - Fix ffnchomp check
+
 0.9.9.5
  - Make use of our parse_long for higher startup performance.
 
