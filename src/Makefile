@@ -94,7 +94,8 @@ time:
 clean:
 	rm -f ffindex.o ffutil.o ffindex_build ffindex_build.o ffindex_get ffindex_get.o libffindex.so libffindex.so.0.1 \
 		ffindex_modify ffindex_modify.o libffindex.a  ffindex_from_fasta.o ffindex_from_fasta ffindex_apply_mpi.o \
-		ffindex_apply.o ffindex_apply ffindex_from_tsv ffindex_khget ffindex_unpack ffindex_from_tsv.o ffindex_unpack.o
+		ffindex_apply.o ffindex_apply ffindex_from_tsv ffindex_khget ffindex_unpack ffindex_from_tsv.o ffindex_unpack.o \
+		ffindex_posix_search.o
 
 install:
 	mkdir -p $(INSTALL_DIR)/bin
