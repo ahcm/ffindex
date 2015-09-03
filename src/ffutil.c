@@ -30,8 +30,7 @@ int fferror_print(char *sourcecode_filename, int line, const char *function_name
 /* remove \n, assumes UNIX line endings! */
 char* ffnchomp(char *s, size_t len)
 {
-  len -= 1;
-  if(len >= 0 && s[len] == '\n')
+  if(len >= 1 && s[--len] == '\n')
     s[len] = '\0';
 
   return s;
