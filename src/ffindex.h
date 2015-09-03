@@ -91,6 +91,9 @@ FILE* ffindex_fopen_by_name(char *data, ffindex_index_t *index, char *name);
 char* ffindex_mmap_data(FILE *file, size_t* size);
 
 
+int ffindex_compare_entries_by_name(const void *pentry1, const void *pentry2);
+
+
 char* ffindex_get_data_by_offset(char* data, size_t offset);
 
 char* ffindex_get_data_by_entry(char *data, ffindex_entry_t* entry);
@@ -116,14 +119,8 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file);
 ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char *entry_name);
 
 
-ffindex_index_t* ffindex_index_as_tree(ffindex_index_t* index);
-
-ffindex_index_t* ffindex_tree_unlink(ffindex_index_t* index, char* name_to_unlink);
-
-ffindex_index_t* ffindex_unlink_entries(ffindex_index_t* index, char** sorted_names_to_unlink, int n_names);
-
-int ffindex_tree_write(ffindex_index_t* index, FILE* index_file);
-
 char* ffindex_copyright();
+
+#include <ffindex_posix_search.h>
 
 #endif
