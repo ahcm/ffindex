@@ -8,14 +8,15 @@ CC=gcc
 #CC=clang
 CFLAGS+=-std=c99 -O2 -g -fPIC -Wall -pedantic -D_GNU_SOURCE=1 -I.
 LDFLAGS=-lffindex -L.
+
+OS:= $(shell uname)
+
 ifdef FFINDEX_STATIC
 	LDFLAGS+=-static
 	FFINDEX_OBJECTS=libffindex.a
 else
 	FFINDEX_OBJECTS=libffindex.so libffindex.so.0.1 
 endif
-
-#-Wl,--version-script=libffindex.map
 
 OBJECTS=ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so ffindex_unpack ffindex_from_tsv
 
@@ -24,6 +25,9 @@ OBJECTS+=ffindex_apply_mpi
 endif
 
 all: $(OBJECTS)
+
+ext/fmemopen.o: ext/fmemopen.c
+	make -C ext
 
 ffindex.o: ffindex.c ffindex.h ffutil.h ffindex_posix_search.h
 
@@ -63,8 +67,13 @@ ffindex_modify: $(FFINDEX_OBJECTS) ffindex_modify.o ffindex.h
 ffindex_unpack: $(FFINDEX_OBJECTS) ffindex_unpack.o ffindex.h
 	$(CC) -o $@ ffindex_unpack.o $(LDFLAGS) -L. -lffindex
 
+ifeq ($(OS), Darwin)
+libffindex.so.0.1: ffindex.o ffutil.o ffindex_posix_search.o ext/fmemopen.o
+		$(CC) -shared -o libffindex.so.0.1 $^
+else
 libffindex.so.0.1: ffindex.o ffutil.o ffindex_posix_search.o
-	$(CC) -Wl,-z,defs -shared -Wl,-soname,libffindex.so.0.1 -o libffindex.so.0.1 $^
+		$(CC) -Wl,-z,defs -Wl,-soname,libffindex.so.0.1 -shared -o libffindex.so.0.1 $^
+endif
 
 libffindex.so: libffindex.so.0.1
 	ln -sf libffindex.so.0.1 libffindex.so
