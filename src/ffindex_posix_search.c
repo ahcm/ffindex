@@ -46,22 +46,22 @@ static __thread FILE * ffindex_tree_write_action_index_file = NULL;
 static __thread int ffindex_tree_write_action_ret = EXIT_SUCCESS;
 
 static void ffindex_tree_write_action(const void *node, const VISIT which, const int depth)
+{
+  ffindex_entry_t *entry;
+  switch (which)
   {
-    ffindex_entry_t *entry;
-    switch (which)
-    {
-      case preorder:
-        break;
-      case endorder:
-        break;
-      case postorder:
-      case leaf:
-        entry = *(ffindex_entry_t **) node;
-        if(fprintf(ffindex_tree_write_action_index_file, "%s\t%zd\t%zd\n", entry->name, entry->offset, entry->length) < 0)
-          ffindex_tree_write_action_ret = EXIT_FAILURE;
-        break;
-    }                                        
+    case preorder:
+      break;
+    case endorder:
+      break;
+    case postorder:
+    case leaf:
+      entry = *(ffindex_entry_t **) node;
+      if(fprintf(ffindex_tree_write_action_index_file, "%s\t%zd\t%zd\n", entry->name, entry->offset, entry->length) < 0)
+        ffindex_tree_write_action_ret = EXIT_FAILURE;
+      break;
   }
+}
 
 int ffindex_tree_write(ffindex_index_t* index, FILE* index_file)
 {
