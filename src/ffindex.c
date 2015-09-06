@@ -461,11 +461,9 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
     return ffindex_tree_write(index, index_file);
 
   for(size_t i = 0; i < index->n_entries; i++)
-  {
-    ffindex_entry_t ffindex_entry = index->entries[i];
-    if(fprintf(index_file, "%s\t%zd\t%zd\n", ffindex_entry.name, ffindex_entry.offset, ffindex_entry.length) < 0)
+    if(ffindex_print_entry(index_file,index->entries + i) < 0)
       return EXIT_FAILURE;
-  }
+
   return EXIT_SUCCESS;
 }
 

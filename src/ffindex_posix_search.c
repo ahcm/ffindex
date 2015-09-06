@@ -47,7 +47,6 @@ static __thread int ffindex_tree_write_action_ret = EXIT_SUCCESS;
 
 static void ffindex_tree_write_action(const void *node, const VISIT which, const int depth)
 {
-  ffindex_entry_t *entry;
   switch (which)
   {
     case preorder:
@@ -56,8 +55,7 @@ static void ffindex_tree_write_action(const void *node, const VISIT which, const
       break;
     case postorder:
     case leaf:
-      entry = *(ffindex_entry_t **) node;
-      if(fprintf(ffindex_tree_write_action_index_file, "%s\t%zd\t%zd\n", entry->name, entry->offset, entry->length) < 0)
+      if(ffindex_print_entry(ffindex_tree_write_action_index_file, *(ffindex_entry_t **) node) < 0)
         ffindex_tree_write_action_ret = EXIT_FAILURE;
       break;
   }
