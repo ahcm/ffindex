@@ -434,6 +434,26 @@ void ffindex_sort_index_file(ffindex_index_t *index)
 }
 
 
+/* Faster than fprintf but no error checking.
+ * If more robustness is neeeded, prealocate the output file.
+ */
+size_t ffindex_print_entry(FILE* file, ffindex_entry_t* entry)
+{
+  size_t written;
+  written = fwrite(entry->name, 1, strlen(entry->name), file);
+  fputc('\t', file);
+
+  written += fffprint_ulong(file, entry->offset);
+  fputc('\t', file);
+
+  written += fffprint_ulong(file, entry->length);
+
+  fputc('\n', file);
+
+  return written + 3; // * fputc
+}
+
+
 int ffindex_write(ffindex_index_t* index, FILE* index_file)
 {
   /* Use tree if available */

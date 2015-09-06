@@ -114,6 +114,8 @@ ffindex_entry_t* ffindex_bsearch_get_entry(ffindex_index_t *index, char *name);
 
 void ffindex_sort_index_file(ffindex_index_t *index);
 
+size_t ffindex_print_entry(FILE* file, ffindex_entry_t* entry);
+
 int ffindex_write(ffindex_index_t* index, FILE* index_file);
 
 ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char *entry_name);
