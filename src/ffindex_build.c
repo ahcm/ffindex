@@ -174,7 +174,8 @@ int main(int argn, char **argv)
     if(S_ISDIR(sb.st_mode))
     {
       err = ffindex_insert_dir(data_file, index_file, &offset, path);
-      if(err < 0)fferror_print(__FILE__, __LINE__, __func__, path);
+      if(err < 0)
+        fferror_print(__FILE__, __LINE__, __func__, path);
     }
     else if(S_ISREG(sb.st_mode))
     {
@@ -197,7 +198,9 @@ int main(int argn, char **argv)
     ffindex_sort_index_file(index);
     index_file = fopen(index_filename, "w");
     if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
-    err += ffindex_write(index, index_file);
+    err = ffindex_write(index, index_file);
+    if(err)
+      fferror_print(__FILE__, __LINE__, __func__, index_filename);
   }
 
   return err;

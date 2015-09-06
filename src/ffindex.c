@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "ext/fmemopen.h" /* For OS not yet implementing this new standard function */
 #include "ffutil.h"
@@ -456,15 +457,22 @@ size_t ffindex_print_entry(FILE* file, ffindex_entry_t* entry)
 
 int ffindex_write(ffindex_index_t* index, FILE* index_file)
 {
+  int ret = EXIT_SUCCESS;
+  ret = posix_fallocate(fileno(index_file), 0, index->n_entries * 30); // guesstimate
+  if(ret)
+    return ret;
+
   /* Use tree if available */
   if(index->type == TREE)
-    return ffindex_tree_write(index, index_file);
+    ret = ffindex_tree_write(index, index_file);
+  else
+    for(size_t i = 0; i < index->n_entries; i++)
+      if(ffindex_print_entry(index_file,index->entries + i) < 6)
+        return EXIT_FAILURE;
 
-  for(size_t i = 0; i < index->n_entries; i++)
-    if(ffindex_print_entry(index_file,index->entries + i) < 0)
-      return EXIT_FAILURE;
+  ftruncate(fileno(index_file), ftell(index_file));
 
-  return EXIT_SUCCESS;
+  return ret;
 }
 
 

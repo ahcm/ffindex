@@ -134,17 +134,15 @@ int main(int argn, char **argv)
   }
 
   if(sort)
-  {
     ffindex_sort_index_file(index);
-    index_file = fopen(index_filename, "w");
-    if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
-    err += ffindex_write(index, index_file);
-  }
 
   /* Write index back */
   index_file = fopen(index_filename, "w");
   if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
-  err += ffindex_write(index, index_file);
+  err = ffindex_write(index, index_file);
+  if(err)
+    fferror_print(__FILE__, __LINE__, __func__, index_filename);
+
   return err;
 }
 
