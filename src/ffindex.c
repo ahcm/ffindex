@@ -343,9 +343,9 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
       else
         names_too_long++;
     index->entries[i].name[p] = '\0';
-    index->entries[i].offset = parse_ulong(++d, &end);
+    index->entries[i].offset = ffparse_ulong(++d, &end);
     d = end;
-    index->entries[i].length  = parse_ulong(++d, &end);
+    index->entries[i].length = ffparse_ulong(++d, &end);
     d = end + 1; /* +1 for newline */
   }
 

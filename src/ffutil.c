@@ -37,7 +37,7 @@ char* ffnchomp(char *s, size_t len)
 }
 
 /* replacement for strtol streamlined for speed */
-unsigned long parse_ulong(const char *s, const char** end)
+unsigned long ffparse_ulong(const char *s, const char** end)
 {
   const unsigned int base = 10;
   unsigned long l = 0UL;
