@@ -24,7 +24,7 @@ int fferror_print(char *sourcecode_filename, int line, const char *function_name
 
 char* ffnchomp(char *s, size_t len);
 
-int ffstrncmp(char* s1, char* s2, size_t len);
+int ffstrncmp(const char* s1, const char* s2, size_t len);
 
 unsigned long ffparse_ulong(const char *s, const char** end);
 

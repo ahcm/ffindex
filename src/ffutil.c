@@ -49,9 +49,9 @@ unsigned long ffparse_ulong(const char *s, const char** end)
 }
 
 
-int ffstrncmp(char* s1, char* s2, size_t len)
+int ffstrncmp(const char* s1, const char* s2, size_t len)
 {
-  for(int i = 0; i < len && *s1 && *s2 && *s1 == *s2; i++, s1++, s2++)
+  for(size_t i = len; i > 0 && *s1 && *s2 && *s1 == *s2; i--, s1++, s2++)
     ;
   return *s1 - *s2;
 }
