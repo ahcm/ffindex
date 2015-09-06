@@ -330,6 +330,8 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   }
   index->type = SORTED_ARRAY; /* XXX Assume a sorted file for now */
 
+  posix_madvise(index->index_data, index->index_data_size, POSIX_MADV_SEQUENTIAL);
+
   /* Faster than scanf per line */
   size_t names_too_long = 0;
   const char* d = index->index_data;
