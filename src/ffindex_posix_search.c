@@ -55,7 +55,7 @@ static void ffindex_tree_write_action(const void *node, const VISIT which, const
       break;
     case postorder:
     case leaf:
-      if(ffindex_print_entry(ffindex_tree_write_action_index_file, *(ffindex_entry_t **) node) < 0)
+      if(ffindex_print_entry(ffindex_tree_write_action_index_file, *(ffindex_entry_t **) node) < 6)
         ffindex_tree_write_action_ret = EXIT_FAILURE;
       break;
   }
