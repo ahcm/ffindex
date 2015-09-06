@@ -23,6 +23,9 @@
 int fferror_print(char *sourcecode_filename, int line, const char *function_name, const char *message);
 
 char* ffnchomp(char *s, size_t len);
+
+int ffstrncmp(char* s1, char* s2, size_t len);
+
 unsigned long ffparse_ulong(const char *s, const char** end);
 
 /* vim: ts=2 sw=2 et

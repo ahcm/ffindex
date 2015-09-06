@@ -48,5 +48,15 @@ unsigned long ffparse_ulong(const char *s, const char** end)
   return l;
 }
 
+
+int ffstrncmp(char* s1, char* s2, size_t len)
+{
+  for(int i = 0; i < len && *s1 && *s2 && *s1 == *s2; i++, s1++, s2++)
+    ;
+  return *s1 - *s2;
+}
+    
+
+
 /* vim: ts=2 sw=2 et
 */
