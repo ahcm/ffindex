@@ -28,5 +28,7 @@ int ffstrncmp(char* s1, char* s2, size_t len);
 
 unsigned long ffparse_ulong(const char *s, const char** end);
 
+size_t fffprint_ulong(FILE* file, unsigned long l);
+
 /* vim: ts=2 sw=2 et
 */

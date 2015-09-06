@@ -57,6 +57,19 @@ int ffstrncmp(char* s1, char* s2, size_t len)
 }
     
 
+size_t fffprint_ulong(FILE* file, unsigned long l)
+{
+  char p[21];
+  char *c = p + 20;
+  while(l >= 10)
+  {
+    *c-- = '0' + (l % 10);
+    l /= 10;
+  }
+  *c = '0' + l;
+  return fwrite(c, 1, p + 21 - c, file);
+}
+
 
 /* vim: ts=2 sw=2 et
 */
