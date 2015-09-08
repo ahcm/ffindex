@@ -1,14 +1,15 @@
 AUTHOR
 
-FFindex was designed and implemented by Andreas Hauser <hauser@genzentrum.lmu.de>.
+FFindex was designed and implemented by Andreas Hauser <andy@splashground.de>.
 Please add your name here if you distribute modified versions.
 
 This file must be distributed with any source or binary distribution including
-parts of this work.
+parts of this work, excempt ffutil.h and ffutil.c which are also available
+under MIT license.
 
 SHORT SUMMARY OF THE LICENSE
 
-Ffindex is provided under the Create Commons license "Attribution-ShareAlike
+FFindex is provided under the Create Commons license "Attribution-ShareAlike
 3.0", which basically captures the spirit of the Gnu Public License (GPL).
 
 See:
