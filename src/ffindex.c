@@ -292,6 +292,19 @@ int ffindex_compare_entries_by_name(const void *pentry1, const void *pentry2)
   return strncmp(entry1->name, entry2->name, FFINDEX_MAX_ENTRY_NAME_LENTH);
 }
 
+
+ffindex_entry_t* ffindex_grep_entry_by_str(ffindex_index_t *ffindex, char *name, size_t* offset)
+{
+  for(size_t i = *offset; i < ffindex->n_entries; i++)
+    if(strstr(ffindex->entries[i].name, name))
+    {
+      *offset = i;
+      return &ffindex->entries[i];
+    }
+  return NULL;
+}
+
+
 ffindex_entry_t* ffindex_get_entry_by_name(ffindex_index_t *index, char *name)
 {
   return ffindex_bsearch_get_entry(index, name);

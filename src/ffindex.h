@@ -103,6 +103,9 @@ char* ffindex_get_data_by_name(char *data, ffindex_index_t *index, char *name);
 char* ffindex_get_data_by_index(char *data, ffindex_index_t *index, size_t entry_index);
 
 
+ffindex_entry_t* ffindex_grep_entry_by_str(ffindex_index_t *ffindex, char *name, size_t* offset);
+
+
 ffindex_entry_t* ffindex_get_entry_by_index(ffindex_index_t *index, size_t entry_index);
 
 ffindex_entry_t* ffindex_get_entry_by_name(ffindex_index_t *index, char *name);
