@@ -335,7 +335,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   index->file = index_file;
   index->index_data = ffindex_mmap_data(index_file, &(index->index_data_size));
   if(index->index_data_size == 0)
-    warn("Problem with data file. Is it empty or is another process reading it?");
+    warn("Problem mapping index file. Is it empty or is another process reading it?");
   if(index->index_data == MAP_FAILED)
   {
     free(index);
