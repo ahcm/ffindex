@@ -122,7 +122,7 @@ int main(int argn, char **argv)
           /* unlink entries in file, one per line */
           char path[PATH_MAX];
           while(fgets(path, PATH_MAX, list_file) != NULL)
-            index = ffindex_unlink(index, ffnchomp(path, strlen(path)));
+            index = ffindex_unlink(index, ffnchomp(path, strnlen(path, PATH_MAX)));
         }
 
       /* unlink entries specified by args */

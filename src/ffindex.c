@@ -146,7 +146,7 @@ int ffindex_insert_list_file(FILE *data_file, FILE *index_file, size_t *start_of
   size_t offset = *start_offset;
   char path[PATH_MAX];
   while(fgets(path, PATH_MAX, list_file) != NULL)
-    ffindex_insert_file(data_file, index_file, &offset, ffnchomp(path, strlen(path)), basename(path));
+    ffindex_insert_file(data_file, index_file, &offset, ffnchomp(path, strnlen(path, PATH_MAX)), basename(path));
 
   /* update return value */
   *start_offset = offset;
@@ -164,7 +164,7 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
     return -1;
   }
 
-  size_t input_dir_name_len = strlen(input_dir_name);
+  size_t input_dir_name_len = strnlen(input_dir_name, FILENAME_MAX);
   char path[PATH_MAX];
   strncpy(path, input_dir_name, NAME_MAX);
   if(input_dir_name[input_dir_name_len - 1] != '/')
@@ -456,7 +456,7 @@ void ffindex_sort_index_file(ffindex_index_t *index)
 size_t ffindex_print_entry(FILE* file, ffindex_entry_t* entry)
 {
   size_t written;
-  written = fwrite(entry->name, 1, strlen(entry->name), file);
+  written = fwrite(entry->name, 1, strnlen(entry->name, FFINDEX_MAX_ENTRY_NAME_LENTH), file);
   fputc('\t', file);
 
   written += fffprint_ulong(file, entry->offset);

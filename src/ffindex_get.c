@@ -111,7 +111,7 @@ int main(int argn, char **argv)
         char name[PATH_MAX];
         while(fgets(name, PATH_MAX, list_file) != NULL)
         {
-          ffindex_entry_t* entry = ffindex_get_entry_by_name(ffindex_db->ffindex, ffnchomp(name, strlen(name)));
+          ffindex_entry_t* entry = ffindex_get_entry_by_name(ffindex_db->ffindex, ffnchomp(name, strnlen(name, PATH_MAX)));
           if(entry == NULL)
           {
             errno = ENOENT; 
