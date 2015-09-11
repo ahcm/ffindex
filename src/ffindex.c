@@ -348,7 +348,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   /* Faster than scanf per line */
   size_t names_too_long = 0;
   const char* d = index->index_data;
-  int i;
+  size_t i;
   for(i = 0; d < (index->index_data + index->index_data_size); i++)
   {
     const char* end;
@@ -491,11 +491,11 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
 }
 
 
-ffindex_index_t* ffindex_unlink_entries(ffindex_index_t* index, char** sorted_names_to_unlink, int n_names)
+ffindex_index_t* ffindex_unlink_entries(ffindex_index_t* index, char** sorted_names_to_unlink, size_t n_names)
 {
-  int i = index->n_entries - 1;
+  size_t i = index->n_entries - 1;
   /* walk list of names to delete */
-  for(int n = n_names - 1; n >= 0;  n--)
+  for(size_t n = n_names - 1; n >= 0;  n--)
   {
     char* name_to_unlink = sorted_names_to_unlink[n];
     /* walk index entries */
