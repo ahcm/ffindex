@@ -491,35 +491,6 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
 }
 
 
-ffindex_index_t* ffindex_unlink_entries(ffindex_index_t* index, char** sorted_names_to_unlink, size_t n_names)
-{
-  size_t i = index->n_entries - 1;
-  /* walk list of names to delete */
-  for(size_t n = n_names - 1; n >= 0;  n--)
-  {
-    char* name_to_unlink = sorted_names_to_unlink[n];
-    /* walk index entries */
-    for(; i >= 0; i--)
-    {
-      int cmp = strncmp(name_to_unlink, index->entries[i].name, FFINDEX_MAX_ENTRY_NAME_LENTH);
-      if(cmp == 0) /* found entry */
-      {
-        /* Move entries after the unlinked ones to close the gap */
-        size_t n_entries_to_move = index->n_entries - i - 1;
-        if(n_entries_to_move > 0) /* not last element of array */
-          memmove(index->entries + i, index->entries + i + 1, n_entries_to_move * sizeof(ffindex_entry_t));
-        index->n_entries--;
-        break;
-      }
-      else if(cmp > 0) /* not found */
-        break;
-    }
-  }
-
-  return index;
-}
-
-
 ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char* name_to_unlink)
 {
   /* Use tree if available */
