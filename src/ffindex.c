@@ -473,9 +473,11 @@ size_t ffindex_print_entry(FILE* file, ffindex_entry_t* entry)
 int ffindex_write(ffindex_index_t* index, FILE* index_file)
 {
   int ret = EXIT_SUCCESS;
+#if _POSIX_C_SOURCE >= 200112L
   ret = posix_fallocate(fileno(index_file), 0, index->n_entries * 30); // guesstimate
   if(ret)
     return ret;
+#endif
 
   /* Use tree if available */
   if(index->type == TREE)
@@ -485,7 +487,10 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
       if(ffindex_print_entry(index_file,index->entries + i) < 6)
         return EXIT_FAILURE;
 
+#if _POSIX_C_SOURCE >= 200112L
+  ret = posix_fallocate(fileno(index_file), 0, index->n_entries * 30); // guesstimate
   ftruncate(fileno(index_file), ftell(index_file));
+#endif
 
   return ret;
 }
