@@ -13,73 +13,77 @@ OS:= $(shell uname)
 
 ifdef FFINDEX_STATIC
 	LDFLAGS+=-static
-	FFINDEX_OBJECTS=libffindex.a
+	FFINDEX_LIBS=libffindex.a
 else
-	FFINDEX_OBJECTS=libffindex.so libffindex.so.0.1 
+	FFINDEX_LIBS=libffindex.so libffindex.so.0.1
 endif
 
-OBJECTS=ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify libffindex.a libffindex.so ffindex_unpack ffindex_from_tsv
+FFINDEX_HEADERS=ffindex.h ffindex_posix_search.h ffutil.h
+FFINDEX_OBJECTS=$(FFINDEX_HEADERS:.h=.o)
+
+FFINDEX_PROGRAMS=ffindex_apply ffindex_from_fasta ffindex_get ffindex_build ffindex_modify ffindex_unpack ffindex_from_tsv
 
 ifdef HAVE_MPI
-OBJECTS+=ffindex_apply_mpi
+FFINDEX_PROGRAMS+=ffindex_apply_mpi
 endif
 
-all: $(OBJECTS)
+all: $(FFINDEX_LIBS) $(FFINDEX_PROGRAMS)
 
+# for Darwin only
 ext/fmemopen.o: ext/fmemopen.c
 	make -C ext
 
-ffindex.o: ffindex.c ffindex.h ffutil.h ffindex_posix_search.h
+ffindex.o: ffindex.c $(FFINDEX_HEADERS)
 
-ffindex_apply.o: ffindex_apply_mpi.c ffindex.h
-	$(CC) $(CFLAGS) -c ffindex_apply_mpi.c -o $@ 
-
-ffindex_apply: $(FFINDEX_OBJECTS) ffindex_apply.o ffindex.h
-	$(CC) $(CFLAGS) -o $@  ffindex_apply.o $(LDFLAGS)
-
-ffindex_apply_mpi: $(FFINDEX_OBJECTS) ffindex_apply_mpi.o ffindex.h
-	mpicc $(CFLAGS) -DHAVE_MPI -o $@  ffindex_apply_mpi.o $(LDFLAGS)
-
-ffindex_apply_mpi.o: ffindex_apply_mpi.c ffindex.h
-	mpicc $(CFLAGS) -DHAVE_MPI -c ffindex_apply_mpi.c -o $@ 
-
-ffindex_apply_mpi_spawn: $(FFINDEX_OBJECTS) ffindex_apply_mpi_spawn.o ffindex.h
-	mpicc $(CFLAGS) -o $@  ffindex_apply_mpi_spawn.o $(LDFLAGS)
-
-ffindex_apply_mpi_spawn.o: ffindex_apply_mpi_spawn.c ffindex.h
-	mpicc $(CFLAGS) -c ffindex_apply_mpi_spawn.c -o $@ 
-
-ffindex_from_fasta: $(FFINDEX_OBJECTS) ffindex_from_fasta.o ffindex.h
-	$(CC) -o $@ ffindex_from_fasta.o $(LDFLAGS) -L. -lffindex
-
-ffindex_from_tsv: $(FFINDEX_OBJECTS) ffindex_from_tsv.o ffindex.h
-	$(CC) -o $@ ffindex_from_tsv.o $(LDFLAGS) -L. -lffindex
-
-ffindex_get: $(FFINDEX_OBJECTS) ffindex_get.o ffindex.h
-	$(CC) -o $@ ffindex_get.o $(LDFLAGS) -L. -lffindex
-
-ffindex_build: $(FFINDEX_OBJECTS) ffindex_build.o ffindex.h
-	$(CC) -o $@ ffindex_build.o $(LDFLAGS) -L. -lffindex
-
-ffindex_modify: $(FFINDEX_OBJECTS) ffindex_modify.o ffindex.h
-	$(CC) -o $@ ffindex_modify.o $(LDFLAGS) -L. -lffindex
-
-ffindex_unpack: $(FFINDEX_OBJECTS) ffindex_unpack.o ffindex.h
-	$(CC) -o $@ ffindex_unpack.o $(LDFLAGS) -L. -lffindex
+libffindex.a: $(FFINDEX_OBJECTS)
+	ar rcs libffindex.a $^
 
 ifeq ($(OS), Darwin)
-libffindex.so.0.1: ffindex.o ffutil.o ffindex_posix_search.o ext/fmemopen.o
+libffindex.so.0.1: $(FFINDEX_OBJECTS) ext/fmemopen.o
 		$(CC) -shared -o libffindex.so.0.1 $^
 else
-libffindex.so.0.1: ffindex.o ffutil.o ffindex_posix_search.o
+libffindex.so.0.1: $(FFINDEX_OBJECTS)
 		$(CC) -Wl,-z,defs -Wl,-soname,libffindex.so.0.1 -shared -o libffindex.so.0.1 $^
 endif
 
 libffindex.so: libffindex.so.0.1
 	ln -sf libffindex.so.0.1 libffindex.so
 
-libffindex.a: ffindex.o ffutil.o ffindex_posix_search.o
-	ar rcs libffindex.a $^
+ffindex_apply.o: ffindex_apply_mpi.c $(FFINDEX_LIBS)
+	$(CC) $(CFLAGS) -c ffindex_apply_mpi.c -o $@ 
+
+ffindex_apply: ffindex_apply.o $(FFINDEX_LIBS)
+	$(CC) $(CFLAGS) -o $@  ffindex_apply.o $(LDFLAGS)
+
+ffindex_apply_mpi: ffindex_apply_mpi.o $(FFINDEX_LIBS)
+	mpicc $(CFLAGS) -DHAVE_MPI -o $@  ffindex_apply_mpi.o $(LDFLAGS)
+
+ffindex_apply_mpi.o: ffindex_apply_mpi.c $(FFINDEX_HEADERS)
+	mpicc $(CFLAGS) -DHAVE_MPI -c ffindex_apply_mpi.c -o $@ 
+
+ffindex_apply_mpi_spawn: ffindex_apply_mpi_spawn.o $(FFINDEX_LIBS)
+	mpicc $(CFLAGS) -o $@  ffindex_apply_mpi_spawn.o $(LDFLAGS)
+
+ffindex_apply_mpi_spawn.o: ffindex_apply_mpi_spawn.o $(FFINDEX_HEADERS)
+	mpicc $(CFLAGS) -c ffindex_apply_mpi_spawn.c -o $@ 
+
+ffindex_from_fasta: ffindex_from_fasta.o $(FFINDEX_LIBS)
+	$(CC) -o $@ ffindex_from_fasta.o $(LDFLAGS)
+
+ffindex_from_tsv: ffindex_from_tsv.o $(FFINDEX_LIBS)
+	$(CC) -o $@ ffindex_from_tsv.o $(LDFLAGS)
+
+ffindex_get: ffindex_get.o $(FFINDEX_LIBS)
+	$(CC) -o $@ ffindex_get.o $(LDFLAGS)
+
+ffindex_build: ffindex_build.o $(FFINDEX_LIBS)
+	$(CC) -o $@ ffindex_build.o $(LDFLAGS)
+
+ffindex_modify: ffindex_modify.o $(FFINDEX_LIBS)
+	$(CC) -o $@ ffindex_modify.o $(LDFLAGS)
+
+ffindex_unpack: ffindex_unpack.o $(FFINDEX_LIBS)
+	$(CC) -o $@ ffindex_unpack.o $(LDFLAGS)
 
 test:
 	rm -f /tmp/test.data /tmp/test.ffindex
@@ -101,10 +105,10 @@ time:
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" zsh -c "time ./ffindex_get  ../test_big/nr20_11Jan10_a3m_db ../test_big/nr20_11Jan10_a3m_db.ffindex BABBAMIBA.a3m KARDUZEBA.a3m HARPAQIBA.a3m WOQQATEBA.a3m BEBRAQIBA.a3m GIRSAKEBA.a3m NAQTIFIBA.a3m BIWCIQABA.a3m > /dev/null"
 
 clean:
-	rm -f ffindex.o ffutil.o ffindex_build ffindex_build.o ffindex_get ffindex_get.o libffindex.so libffindex.so.0.1 \
-		ffindex_modify ffindex_modify.o libffindex.a  ffindex_from_fasta.o ffindex_from_fasta ffindex_apply_mpi.o \
-		ffindex_apply.o ffindex_apply ffindex_from_tsv ffindex_khget ffindex_unpack ffindex_from_tsv.o ffindex_unpack.o \
-		ffindex_posix_search.o
+	rm -f $(FFINDEX_PROGRAMS) $(FFINDEX_OBJECTS) $(FFINDEX_LIBS) \
+		libffindex.so libffindex.so.0.1 libffindex.a \
+		ffindex_build.o ffindex_get.o ffindex_modify.o ffindex_from_fasta.o ffindex_apply_mpi.o \
+		ffindex_apply.o ffindex_from_tsv.o ffindex_unpack.o ffindex_posix_search.o ffindex_apply_mpi_spawn.o
 
 install:
 	mkdir -p $(INSTALL_DIR)/bin
