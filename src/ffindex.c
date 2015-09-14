@@ -326,7 +326,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   ffindex_index_t *index = (ffindex_index_t *)malloc(nbytes);
   if(index == NULL)
   {
-    fprintf(stderr, "Failed to allocate %ld bytes\n", nbytes);
+    fprintf(stderr, "Failed to allocate %ld bytes for index\n", nbytes);
     fferror_print(__FILE__, __LINE__, __func__, "malloc failed");
     return NULL;
   }
