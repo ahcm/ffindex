@@ -488,7 +488,6 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
         return EXIT_FAILURE;
 
 #if _POSIX_C_SOURCE >= 200112L
-  ret = posix_fallocate(fileno(index_file), 0, index->n_entries * 30); // guesstimate
   ftruncate(fileno(index_file), ftell(index_file));
 #endif
 
