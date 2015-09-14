@@ -501,19 +501,8 @@ ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char* name_to_unlink)
   /* Use tree if available */
   if(index->type == TREE)
     return ffindex_tree_unlink(index, name_to_unlink);
-
-  ffindex_entry_t* entry = ffindex_bsearch_get_entry(index, name_to_unlink);
-  if(entry == NULL)
-  {
-    fprintf(stderr, "Warning: could not find '%s'\n", name_to_unlink);
-    return index;
-  }
-  /* Move entries after the unlinked one to close the gap */
-  size_t n_entries_to_move = index->entries + index->n_entries - entry - 1;
-  if(n_entries_to_move > 0) /* not last element of array */
-    memmove(entry, entry + 1, n_entries_to_move * sizeof(ffindex_entry_t));
-  index->n_entries--;
-  return index;
+  else
+    return NULL;
 }
 
 
