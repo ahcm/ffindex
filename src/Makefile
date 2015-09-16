@@ -11,12 +11,7 @@ LDFLAGS=-lffindex -L.
 
 OS:= $(shell uname)
 
-ifdef FFINDEX_STATIC
-	LDFLAGS+=-static
-	FFINDEX_LIBS=libffindex.a
-else
-	FFINDEX_LIBS=libffindex.so libffindex.so.0.1
-endif
+FFINDEX_LIBS=libffindex.so libffindex.so.0.1 libffindex.a
 
 FFINDEX_HEADERS=ffindex.h ffindex_posix_search.h ffutil.h
 FFINDEX_OBJECTS=$(FFINDEX_HEADERS:.h=.o)
@@ -42,8 +37,14 @@ ifeq ($(OS), Darwin)
 libffindex.so.0.1: $(FFINDEX_OBJECTS) ext/fmemopen.o
 		$(CC) -shared -o libffindex.so.0.1 $^
 else
+
+ ifdef FFINDEX_STATIC
+STATIC=-static
+ endif
+
 libffindex.so.0.1: $(FFINDEX_OBJECTS)
 		$(CC) -Wl,-z,defs -Wl,-soname,libffindex.so.0.1 -shared -o libffindex.so.0.1 $^
+
 endif
 
 libffindex.so: libffindex.so.0.1
@@ -53,7 +54,7 @@ ffindex_apply.o: ffindex_apply_mpi.c $(FFINDEX_LIBS)
 	$(CC) $(CFLAGS) -c ffindex_apply_mpi.c -o $@ 
 
 ffindex_apply: ffindex_apply.o $(FFINDEX_LIBS)
-	$(CC) $(CFLAGS) -o $@  ffindex_apply.o $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@  ffindex_apply.o $(LDFLAGS) $(STATIC)
 
 ffindex_apply_mpi: ffindex_apply_mpi.o $(FFINDEX_LIBS)
 	mpicc $(CFLAGS) -DHAVE_MPI -o $@  ffindex_apply_mpi.o $(LDFLAGS)
@@ -68,22 +69,22 @@ ffindex_apply_mpi_spawn.o: ffindex_apply_mpi_spawn.o $(FFINDEX_HEADERS)
 	mpicc $(CFLAGS) -c ffindex_apply_mpi_spawn.c -o $@ 
 
 ffindex_from_fasta: ffindex_from_fasta.o $(FFINDEX_LIBS)
-	$(CC) -o $@ ffindex_from_fasta.o $(LDFLAGS)
+	$(CC) -o $@ ffindex_from_fasta.o $(LDFLAGS) $(STATIC)
 
 ffindex_from_tsv: ffindex_from_tsv.o $(FFINDEX_LIBS)
-	$(CC) -o $@ ffindex_from_tsv.o $(LDFLAGS)
+	$(CC) -o $@ ffindex_from_tsv.o $(LDFLAGS) $(STATIC)
 
 ffindex_get: ffindex_get.o $(FFINDEX_LIBS)
-	$(CC) -o $@ ffindex_get.o $(LDFLAGS)
+	$(CC) -o $@ ffindex_get.o $(LDFLAGS) $(STATIC)
 
 ffindex_build: ffindex_build.o $(FFINDEX_LIBS)
-	$(CC) -o $@ ffindex_build.o $(LDFLAGS)
+	$(CC) -o $@ ffindex_build.o $(LDFLAGS) $(STATIC)
 
 ffindex_modify: ffindex_modify.o $(FFINDEX_LIBS)
-	$(CC) -o $@ ffindex_modify.o $(LDFLAGS)
+	$(CC) -o $@ ffindex_modify.o $(LDFLAGS) $(STATIC)
 
 ffindex_unpack: ffindex_unpack.o $(FFINDEX_LIBS)
-	$(CC) -o $@ ffindex_unpack.o $(LDFLAGS)
+	$(CC) -o $@ ffindex_unpack.o $(LDFLAGS) $(STATIC)
 
 test:
 	rm -f /tmp/test.data /tmp/test.ffindex
