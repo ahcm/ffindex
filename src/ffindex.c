@@ -367,6 +367,11 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 
   index->n_entries = i;
 
+  /* Make sure that the actually filled part part of the index stays
+   * in memory even under memory pressure.
+   */
+  mlock(index, sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * index->n_entries));
+
   if(index->n_entries == 0)
     warnx("index with 0 entries");
 
