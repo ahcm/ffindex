@@ -323,8 +323,8 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   if(num_max_entries == 0)
     num_max_entries = FFINDEX_MAX_INDEX_ENTRIES_DEFAULT;
   size_t nbytes = sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * num_max_entries);
-  ffindex_index_t *index = (ffindex_index_t *)malloc(nbytes);
-  if(index == NULL)
+  ffindex_index_t *index = (ffindex_index_t *)mmap(0, nbytes, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+  if(index == MAP_FAILED)
   {
     fprintf(stderr, "Failed to allocate %ld bytes for index\n", nbytes);
     fferror_print(__FILE__, __LINE__, __func__, "malloc failed");
