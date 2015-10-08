@@ -3,7 +3,7 @@ libdir=`([ -d /usr/lib64 ] && echo lib64) || echo lib`
 LANG=C
 #CC=musl-gcc
 #OMPI_CC=musl-gcc
-CC=gcc
+#CC=gcc
 #CC=icc
 #CC=clang
 CFLAGS+=-std=c99 -O2 -g -fPIC -Wall -pedantic -D_GNU_SOURCE=1 -I.
