@@ -73,7 +73,10 @@ int ffindex_index_db_close(ffindex_db_t* ffindex_db)
 
 int ffindex_index_close(ffindex_index_t* ffindex)
 {
-  free(ffindex);
+  size_t nbytes = sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * ffindex->num_max_entries);
+  int ret = munmap(ffindex, nbytes);
+  if(ret)
+    return ret;
   return EXIT_SUCCESS;
 }
 
