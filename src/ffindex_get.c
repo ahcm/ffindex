@@ -68,7 +68,6 @@ int main(int argn, char **argv)
   ffindex_db = ffindex_index_db_open(ffindex_db);
   if(!ffindex_db)
   {
-    errno = EINVAL;
     fferror_print(__FILE__, __LINE__, "ffindex_index_db_open failed", argv[0]);
     return EXIT_FAILURE;
   }

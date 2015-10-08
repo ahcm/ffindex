@@ -49,7 +49,24 @@ ffindex_db_t * ffindex_index_db_open(ffindex_db_t * ffindex_db)
     return NULL;
 
   ffindex_db->ffindex = ffindex_index_parse(ffindex_db->ffindex_file, ffindex_db->num_max_entries);
+
+  if(!ffindex_db->ffindex)
+  {
+    fferror_print(__FILE__, __LINE__, __func__, ffindex_db->ffindex_filename);
+    return NULL;
+  }
+
   ffindex_db->ffdata = ffindex_mmap_data(ffindex_db->ffdata_file, &ffindex_db->ffdata_size);
+
+  if(ffindex_db->ffdata_size == 0)
+    warn("Problem mapping index file. Is it empty or is another process reading it?");
+
+  if(ffindex_db->ffdata == MAP_FAILED)
+  {
+    fferror_print(__FILE__, __LINE__, __func__, ffindex_db->ffdata_filename);
+    return NULL;
+  }
+  ffindex_db->ffindex->type = SORTED_ARRAY; /* XXX Assume a sorted file for now */
 
   return ffindex_db;
 }
@@ -373,7 +390,7 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
     warn("Problem mapping index file. Is it empty or is another process reading it?");
   if(index->index_data == MAP_FAILED)
   {
-    free(index);
+    ffindex_index_close(index);
     return NULL;
   }
   index->type = SORTED_ARRAY; /* XXX Assume a sorted file for now */
@@ -402,10 +419,27 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 
   index->n_entries = i;
 
+  int ret = 0;
+  
+  ret = munmap(index->index_data, index->index_data_size);
+
+  if(ret)
+  {
+    fferror_print(__FILE__, __LINE__, __func__, "munmap");
+    return NULL;
+  }
+
+
   /* Make sure that the actually filled part part of the index stays
    * in memory even under memory pressure.
    */
-  mlock(index, sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * index->n_entries));
+  ret = mlock(index, sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * index->n_entries));
+
+  if(ret)
+  {
+    fferror_print(__FILE__, __LINE__, __func__, "mlock");
+    return NULL;
+  }
 
   if(index->n_entries == 0)
     warnx("index with 0 entries");
