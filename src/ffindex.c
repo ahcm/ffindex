@@ -374,8 +374,10 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 {
   if(num_max_entries == 0)
     num_max_entries = FFINDEX_MAX_INDEX_ENTRIES_DEFAULT;
+
   size_t nbytes = sizeof(ffindex_index_t) + (sizeof(ffindex_entry_t) * num_max_entries);
   ffindex_index_t *index = (ffindex_index_t *)mmap(0, nbytes, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+
   if(index == MAP_FAILED)
   {
     fprintf(stderr, "Failed to allocate %ld bytes for index\n", nbytes);
@@ -386,8 +388,10 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 
   index->file = index_file;
   index->index_data = ffindex_mmap_data(index_file, &(index->index_data_size));
+
   if(index->index_data_size == 0)
     warn("Problem mapping index file. Is it empty or is another process reading it?");
+
   if(index->index_data == MAP_FAILED)
   {
     ffindex_index_close(index);
@@ -403,6 +407,14 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
   size_t i;
   for(i = 0; d < (index->index_data + index->index_data_size); i++)
   {
+    if(i >= index->num_max_entries)
+    {
+      errno = EINVAL;
+      fferror_print(__FILE__, __LINE__, __func__, "too many entries in index");
+      munmap(index->index_data, index->index_data_size);
+      ffindex_index_close(index);
+      return NULL;
+    }
     const char* end;
     int p;
     for(p = 0; *d != '\t'; d++)
