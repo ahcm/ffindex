@@ -55,6 +55,29 @@ ffindex_db_t * ffindex_index_db_open(ffindex_db_t * ffindex_db)
 }
 
 
+int ffindex_index_db_close(ffindex_db_t* ffindex_db)
+{
+  int ret = EXIT_SUCCESS;
+
+  ffindex_index_close(ffindex_db->ffindex);
+
+  ret = munmap(ffindex_db->ffdata, ffindex_db->ffdata_size);
+  if(ret)
+    return ret;
+
+  free(ffindex_db);
+
+  return EXIT_SUCCESS;
+}
+
+
+int ffindex_index_close(ffindex_index_t* ffindex)
+{
+  free(ffindex);
+  return EXIT_SUCCESS;
+}
+
+
 /* return *out_data_file, *out_index_file, out_offset.
  Setting to a given offset could be supported with a special mode.
  */

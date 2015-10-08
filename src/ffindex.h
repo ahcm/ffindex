@@ -68,6 +68,11 @@ typedef struct ffindex_db
 
 ffindex_db_t * ffindex_index_db_open(ffindex_db_t * ffindex_db);
 
+int ffindex_index_db_close(ffindex_db_t* ffindex_db);
+
+
+int ffindex_index_close(ffindex_index_t* ffindex);
+
 /* return *out_data_file, *out_index_file, out_offset. */
 int ffindex_index_open(char *data_filename, char *index_filename, char* mode, FILE **out_data_file, FILE **out_index_file, size_t *out_offset);
 

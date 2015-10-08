@@ -143,6 +143,8 @@ int main(int argn, char **argv)
   if(err)
     fferror_print(__FILE__, __LINE__, __func__, index_filename);
 
+  ffindex_index_close(index);
+
   return err;
 }
 

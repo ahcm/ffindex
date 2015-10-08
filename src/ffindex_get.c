@@ -173,6 +173,8 @@ int main(int argn, char **argv)
          */
   }
 
+  ffindex_index_db_close(ffindex_db);
+
   return 0;
 }
 
