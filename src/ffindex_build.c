@@ -40,6 +40,7 @@ void usage(char *program_name)
                     "\t-s\t\tsort index file, so that the index can queried.\n"
                     "\t\t\tAnother append operations can be done without sorting.\n"
                     "\t-v\t\tprint version and other info then exit\n"
+                    "\t-h\t\tdisplay this help message\n"
                     "\nEXAMPLES:\n"
                     "\tCreate a new ffindex containing all files from the \"bar/\" directory containing\n"
                     "\tsay myfile1.txt, myfile2.txt and sort (-s) it so that e.g. ffindex_get can use it.\n"
@@ -49,7 +50,8 @@ void usage(char *program_name)
                     "\n\tOops, forgot to sort it (-s) so do it afterwards:\n"
                     "\t\t$ ffindex_build -as foo.ffdata foo.ffindex\n"
                     "\nNOTE:\n"
-                    "\tMaximum key/filename length is %d and maximum entries are by default %d\n"
+                    "\tCompiled with a maximum key/filename length is %d and\n"
+                    "\tdefault maximum entries %d.\n"
                     "\tThis can be changed in the sources.\n"
                     FFINDEX_COPYRIGHT,
                     program_name, MAX_FILENAME_LIST_FILES, FFINDEX_MAX_ENTRY_NAME_LENTH, FFINDEX_MAX_INDEX_ENTRIES_DEFAULT);
@@ -65,7 +67,8 @@ int main(int argn, char **argv)
   size_t list_ffindex_data_index = 0;
   size_t list_ffindex_index_index = 0;
   size_t list_filenames_index = 0;
-  while ((opt = getopt(argn, argv, "asuvd:f:i:")) != -1)
+  char* program_name = basename(argv[0]);
+  while ((opt = getopt(argn, argv, "asuvd:f:hi:")) != -1)
   {
     switch (opt)
     {
@@ -81,6 +84,9 @@ int main(int argn, char **argv)
       case 'f':
         list_filenames[list_filenames_index++] = optarg;
         break;
+      case 'h':
+        usage(program_name);
+        return EXIT_SUCCESS;
       case 's':
         sort = 1;
         break;
