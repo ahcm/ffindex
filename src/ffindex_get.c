@@ -26,6 +26,7 @@ void usage(char* program_name)
 {
     fprintf(stderr, "USAGE: %s data_filename index_filename entry name(s)\n"
                     "\t-f FILE\t\tfile containing a list of file names, one per line\n"
+                    "\t-h\t\tdisplay this help message\n"
                     "\t-n\t\tuse index of entry instead of entry name\n"
                     FFINDEX_COPYRIGHT,
                     program_name);
@@ -37,7 +38,8 @@ int main(int argn, char **argv)
   int opt;
   char* list_filenames[4096];
   size_t list_filenames_index = 0;
-  while ((opt = getopt(argn, argv, "f:n")) != -1)
+  char* program_name = basename(argv[0]);
+  while ((opt = getopt(argn, argv, "f:hn")) != -1)
   {
     switch (opt)
     {
@@ -47,8 +49,11 @@ int main(int argn, char **argv)
       case 'n':
         by_index = 1;
         break;
+      case 'h':
+        usage(program_name);
+        return EXIT_SUCCESS;
       default:
-        usage(argv[0]);
+        usage(program_name);
         return EXIT_FAILURE;
     }
   }
