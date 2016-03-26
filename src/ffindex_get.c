@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <libgen.h>
 
 #include "ffindex.h"
 #include "ffutil.h"
