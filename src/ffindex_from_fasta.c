@@ -33,18 +33,26 @@ void usage(char *program_name)
 {
     fprintf(stderr, "USAGE: %s -v | [-s] data_filename index_filename fasta_filename\n"
                     "\t-s\tsort index file\n"
+                    "\t-i\tuse identifier as name (you probably want -s too)\n"
+                    "\t-n\tuse incremental number as id (default)\n"
+                    "\t-v\tprint version\n"
                     FFINDEX_COPYRIGHT,
                     program_name);
 }
 
 int main(int argn, char **argv)
 {
-  int sort = 0, version = 0;
+  int sort = 0, version = 0, use_identifier = 0;
   int opt, err = EXIT_SUCCESS;
-  while ((opt = getopt(argn, argv, "sv")) != -1)
+  while ((opt = getopt(argn, argv, "sinv")) != -1)
   {
     switch (opt)
     {
+      case 'n':
+        break;
+      case 'i':
+        use_identifier = 1;
+        break;
       case 's':
         sort = 1;
         break;
@@ -98,7 +106,16 @@ int main(int argn, char **argv)
       fasta_offset++;
       from_length++;
     }
-    sprintf(name, "%d", seq_id++);
+    if(use_identifier)
+    {
+      size_t len = strcspn(fasta_data + (fasta_offset + 1 - from_length), " \n");
+      if(len > FFINDEX_MAX_ENTRY_NAME_LENTH)
+        len = FFINDEX_MAX_ENTRY_NAME_LENTH - 1;
+      strncpy(name, fasta_data + (fasta_offset + 1 - from_length), len);
+      name[len] = '\0';
+    }
+    else
+      sprintf(name, "%d", seq_id++);
     ffindex_insert_memory(data_file, index_file, &offset, fasta_data + (fasta_offset - from_length), from_length, name);
   }
   fclose(data_file);
