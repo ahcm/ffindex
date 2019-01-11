@@ -60,7 +60,7 @@ int main(int argn, char **argv)
         version = 1;
         break;
       default:
-        usage(argv[0]);
+        usage(basename(argv[0]));
         return EXIT_FAILURE;
     }
   }
@@ -74,7 +74,7 @@ int main(int argn, char **argv)
 
   if(argn - optind < 3)
   {
-    usage(argv[0]);
+    usage(basename(argv[0]));
     return EXIT_FAILURE;
   }
 
