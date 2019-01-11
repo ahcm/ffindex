@@ -214,8 +214,8 @@ int main(int argn, char **argv)
                     "\t-d\tFFDATA output file, stdout of program will be captured\n"
                     "\t-i\tFFINDEX output file, entries get the same name as input entry\n"
                     FFINDEX_COPYRIGHT,
-                    argv[0],
-                    argv[0]);
+                    basename(argv[0]),
+                    basename(argv[0]));
     errno = EINVAL;
     goto EXCEPTION;
   }
