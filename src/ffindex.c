@@ -591,5 +591,31 @@ ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char* name_to_unlink)
 }
 
 
+int ffsort_index(const char* index_filename)
+{
+  int err;
+  FILE* index_file = fopen(index_filename, "r");
+  size_t lines = ffcount_lines(index_filename);
+
+  /* read index */
+  ffindex_index_t* index = ffindex_index_parse(index_file, lines);
+  if(index == NULL)
+  {
+    fferror_print(__FILE__, __LINE__, __func__, index_filename);
+    exit(EXIT_FAILURE);
+  }
+  fclose(index_file);
+
+  /* sort and write back */
+  ffindex_sort_index_file(index);
+  index_file = fopen(index_filename, "w");
+  if(index_file == NULL) { perror(index_filename); return EXIT_FAILURE; }
+  err = ffindex_write(index, index_file);
+  if(err)
+    fferror_print(__FILE__, __LINE__, __func__, index_filename);
+  fclose(index_file);
+  return err;
+}
+
 /* vim: ts=2 sw=2 et
 */

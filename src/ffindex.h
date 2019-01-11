@@ -128,6 +128,8 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file);
 
 ffindex_index_t* ffindex_unlink(ffindex_index_t* index, char *entry_name);
 
+int ffsort_index(const char* index_filename);
+
 
 char* ffindex_copyright();
 
