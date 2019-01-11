@@ -71,7 +71,7 @@ int main(int argn, char **argv)
         break;
       default:
         fprintf(stderr, "Option %c not recognized\n", opt);
-        usage(argv[0]);
+        usage(basename(argv[0]));
         return EXIT_FAILURE;
     }
   }
