@@ -52,5 +52,7 @@ unsigned long ffparse_ulong(const char *s, const char** end);
 
 size_t fffprint_ulong(FILE* file, unsigned long l);
 
+size_t ffcount_lines(const char *filename);
+
 /* vim: ts=2 sw=2 et
 */

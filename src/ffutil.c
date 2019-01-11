@@ -93,5 +93,26 @@ size_t fffprint_ulong(FILE* file, unsigned long l)
 }
 
 
+size_t ffcount_lines(const char *filename)
+{
+  FILE *fp = fopen(filename, "r");
+  if (fp == NULL) { return 0; }
+
+  size_t lines = 0;
+  int ch = 0;
+
+  do {
+    ch = fgetc(fp);
+    if (ch == '\n')
+      lines++;
+  } while(ch != EOF);
+
+  if(ch != '\n' && lines != 0)
+    lines++;
+
+  fclose(fp);
+  return lines;
+}
+
 /* vim: ts=2 sw=2 et
 */
