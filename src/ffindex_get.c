@@ -70,6 +70,7 @@ int main(int argn, char **argv)
   ffindex_db->ffdata_filename = data_filename;
   ffindex_db->ffindex_filename = index_filename;
   ffindex_db->mode[0] = 'r';
+  ffindex_db->num_max_entries = ffcount_lines(index_filename);
 
   ffindex_db = ffindex_index_db_open(ffindex_db);
   if(!ffindex_db)
