@@ -37,7 +37,7 @@ int main(int argn, char **argv)
     fprintf(stderr, "USAGE: %s DATA_FILENAME INDEX_FILENAME OUT_DIR\n"
                     "\n\tPlease note that a huge number of files might be created!\n"
                     FFINDEX_COPYRIGHT,
-                    argv[0]);
+                    basename(argv[0]));
     return -1;
   }
   char *data_filename  = argv[1];
