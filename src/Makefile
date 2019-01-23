@@ -86,6 +86,9 @@ ffindex_modify: ffindex_modify.o $(FFINDEX_LIBS)
 ffindex_unpack: ffindex_unpack.o $(FFINDEX_LIBS)
 	$(CC) -o $@ ffindex_unpack.o $(LDFLAGS) $(STATIC)
 
+ffindex_order: ffindex_order.o $(FFINDEX_LIBS)
+	$(CC) -o $@ ffindex_unpack.o $(LDFLAGS) $(STATIC)
+
 test:
 	rm -f /tmp/test.data /tmp/test.ffindex
 	LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./ffindex_build -s /tmp/test.data /tmp/test.ffindex ../test/data ../test/data2
