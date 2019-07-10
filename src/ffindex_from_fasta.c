@@ -14,14 +14,12 @@
 #define _LARGEFILE64_SOURCE 1
 #define _FILE_OFFSET_BITS 64
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <libgen.h>
 
 #include "ffindex.h"
 #include "ffutil.h"

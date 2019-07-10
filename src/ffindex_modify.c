@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <unistd.h>
+#include <libgen.h>
 
 
 #include "ffindex.h"
