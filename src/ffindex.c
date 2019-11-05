@@ -449,8 +449,10 @@ ffindex_index_t* ffindex_index_parse(FILE *index_file, size_t num_max_entries)
 
   if(ret)
   {
-    fferror_print(__FILE__, __LINE__, __func__, "mlock");
-    return NULL;
+    /* Ignore. Linux distros keep the default value at too low values. */
+    //fferror_print(__FILE__, __LINE__, __func__, "mlock");
+    //return NULL;
+    errno = 0;
   }
 
   if(index->n_entries == 0)
