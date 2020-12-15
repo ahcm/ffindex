@@ -576,7 +576,7 @@ int ffindex_write(ffindex_index_t* index, FILE* index_file)
         return EXIT_FAILURE;
 
 #if _POSIX_C_SOURCE >= 200112L
-  ftruncate(fileno(index_file), ftell(index_file));
+  ret = ftruncate(fileno(index_file), ftell(index_file));
 #endif
 
   return ret;
