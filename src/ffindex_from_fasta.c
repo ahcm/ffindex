@@ -95,9 +95,10 @@ int main(int argn, char **argv)
   char *fasta_data = ffindex_mmap_data(fasta_file, &fasta_size);
   size_t from_length = 0;
   char name[FFINDEX_MAX_ENTRY_NAME_LENTH];
-  int seq_id = 1;
+  int seq_id = 0;
   for(size_t fasta_offset = 1; fasta_offset < fasta_size; fasta_offset++) // position after first ">"
   {
+    seq_id++;
     from_length = 1;
     while(fasta_offset < fasta_size && !(*(fasta_data + fasta_offset) == '>' && *(fasta_data + fasta_offset - 1) == '\n'))
     {
@@ -113,7 +114,7 @@ int main(int argn, char **argv)
       name[len] = '\0';
     }
     else
-      sprintf(name, "%d", seq_id++);
+      sprintf(name, "%d", seq_id);
     ffindex_insert_memory(data_file, index_file, &offset, fasta_data + (fasta_offset - from_length), from_length, name);
   }
   fclose(data_file);
@@ -122,7 +123,7 @@ int main(int argn, char **argv)
   if(sort)
   {
     rewind(index_file);
-    ffindex_index_t* index = ffindex_index_parse(index_file, 0);
+    ffindex_index_t* index = ffindex_index_parse(index_file, seq_id);
     if(index == NULL)
     {
       perror("ffindex_index_parse failed");
