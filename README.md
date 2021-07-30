@@ -9,6 +9,13 @@ which basically captures the spirit of the Gnu Public License (GPL).
 See:
 http://creativecommons.org/licenses/by-sa/4.0/
 
+In addition, modified distributions need to add additional authors in files they distribute.
+Also mainline code must be refered to inlcuding a link:
+
+https://github.com/ahcm/ffindex
+
+Should the mainline code URL change, these changes must be reflected, so that the mainlin link is always pointing to current mainline.
+
 # Notice
 
 This is mainline FFindex:
