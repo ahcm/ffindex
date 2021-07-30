@@ -9,6 +9,22 @@ which basically captures the spirit of the Gnu Public License (GPL).
 See:
 http://creativecommons.org/licenses/by-sa/4.0/
 
+# Notice
+
+This is mainline FFindex.
+
+A prominent fork is https://github.com/soedinglab/ffindex_soedinglab
+
+It introduces many bugs, limitations and security flaws.
+In violation of what the license asks, the authors do not add their names to the modified files.
+
+There is an open github issue: https://github.com/soedinglab/ffindex_soedinglab/issues/9
+
+From looking at the code I can only advise not to use it.
+Certainly not in a public service.
+
+If you have a problem with the fork, it might be worthwhile to just try mainline.
+
 # Thanks
 
 Thanks to Laszlo Kajan for creating and maintaining Debian packages
