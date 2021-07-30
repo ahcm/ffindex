@@ -11,7 +11,8 @@ http://creativecommons.org/licenses/by-sa/4.0/
 
 # Notice
 
-This is mainline FFindex.
+This is mainline FFindex:
+https://github.com/ahcm/ffindex
 
 A prominent fork is https://github.com/soedinglab/ffindex_soedinglab
 
