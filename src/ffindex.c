@@ -217,7 +217,7 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
   }
 
   size_t input_dir_name_len = strnlen(input_dir_name, FILENAME_MAX);
-  char path[PATH_MAX];
+  char path[PATH_MAX + 1];
   strncpy(path, input_dir_name, NAME_MAX);
   if(input_dir_name[input_dir_name_len - 1] != '/')
   {
@@ -231,7 +231,8 @@ int ffindex_insert_dir(FILE *data_file, FILE *index_file, size_t *start_offset, 
   {
     if(entry->d_name[0] == '.')
       continue;
-    strncpy(path + input_dir_name_len, entry->d_name, NAME_MAX);
+    strncpy(path + input_dir_name_len, entry->d_name, PATH_MAX - input_dir_name_len);
+    path[PATH_MAX] = '\0';
     struct stat sb;
     if(stat(path, &sb) == -1)
       fferror_print(__FILE__, __LINE__, __func__, path);
