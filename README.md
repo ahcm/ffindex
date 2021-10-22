@@ -14,7 +14,7 @@ Also mainline code must be refered to inlcuding a link:
 
 https://github.com/ahcm/ffindex
 
-Should the mainline code URL change, these changes must be reflected, so that the mainlin link is always pointing to current mainline.
+Should the mainline code URL change, these changes must be reflected, so that the link is always pointing to current mainline.
 
 # Notice
 
