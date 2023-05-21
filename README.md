@@ -86,7 +86,7 @@ the ffindex_build program.
 Setup environment:
 ```
 $ export PATH="$INSTALL_DIR/bin:$PATH"
-$ export LD_LIBRARY_PATH="$INSTALL_DIR/lib:$LD_LIBRARY_PATH"
+$ export LD_LIBRARY_PATH="$INSTALL_DIR/lib64:$LD_LIBRARY_PATH"
 ```
 On OS X set DYLD_LIBRARY_PATH instead of LD_LIBRARY_PATH.
 
