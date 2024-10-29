@@ -3,7 +3,7 @@
 FFindex was written by Andreas Hauser <Andreas.Hauser@LMU.de>.
 Please add your name here if you distribute modified versions.
 
-FFindex is registered trademark of the Ludwig-Maximilians-Universität, Munich (LMU).
+FFindex is a registered trademark of the Ludwig-Maximilians-Universität, Munich (LMU).
 
 FFindex is provided under the Create Commons license "Attribution-ShareAlike 4.0",
 which basically captures the spirit of the Gnu Public License (GPL).
