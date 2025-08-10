@@ -36,7 +36,7 @@
 
 char* ffindex_copyright_text = FFINDEX_COPYRIGHT;
 
-char* ffindex_copyright()
+char* ffindex_copyright(void)
 {
   return ffindex_copyright_text;
 }

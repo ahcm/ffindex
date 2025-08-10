@@ -5,7 +5,9 @@
  *         Based on FMem.c of Alexandre Flori (2008/10/17 AF)
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
